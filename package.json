@@ -1,0 +1,23 @@
+{
+  "name": "lastmiledeliverysystem",
+  "version": "1.0.0",
+  "description": "LastMileDeliverySystem",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lastmiledeliverysystem/LastMileDeliverySystem.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lastmiledeliverysystem/LastMileDeliverySystem/issues"
+  },
+  "homepage": "https://github.com/lastmiledeliverysystem/LastMileDeliverySystem#readme",
+  "dependencies": {
+    "express": "^4.16.4",
+    "mongoose": "^5.4.11"
+  }
+}
