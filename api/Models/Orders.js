@@ -6,11 +6,11 @@ const orders = new mongoose.Schema({
   date: Date,
   status: {
     type: String,
-    required: true
+    required: true,
   },
   shippmentDate: {
     type: Date,
-    required: false
+    required: false,
   },
   //customerId:  mongoose.Schema.Types.ObjectId,
   discountAmount: Number,
@@ -19,21 +19,21 @@ const orders = new mongoose.Schema({
     //_id: mongoose.Schema.Types.ObjectId,
     name: {
       type: String,
-      required: true
+      required: true,
     },
     description: String,
     quantity: {
       type: Number,
-      required: true
+      required: true,
     },
     unit: {
       type: String,
-      required: true
+      required: true,
     },
     imageName: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   shippingCharge: Number,
   total: Number,
@@ -41,33 +41,33 @@ const orders = new mongoose.Schema({
   address: [{
     address1: {
       type: String,
-      required: true
+      required: true,
     },
     address2: {
       type: String,
-      required: true
+      required: true,
     },
     state: {
       type: String,
-      required: true
+      required: true,
     },
     city: {
       type: String,
-      required: true
+      required: true,
     },
     zip: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   }],
   deliveryDate: {
     type: Date,
-    required: false
+    required: false,
   },
   trackingPassword: String,
   paymentMethod: {
     type: String,
-    required: true
+    required: true,
   },
   //paymentId: mongoose.Schema.Types.ObjectId,
   //vendorId:  mongoose.Schema.Types.ObjectId

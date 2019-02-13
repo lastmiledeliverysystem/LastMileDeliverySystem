@@ -55,5 +55,33 @@ router.post('/', async (req, res) => {
   }
 });
 
+router.put('/:id', async (req, res) => {
+  try {
+    const { email, password, permission } = req.body;
+    const { id } = req.params;
+    const user = await Users.findById(id);
+    if (_.isEmpty(user)) return res.status(404).send('User not found');
+    const result = Joi.validate(req.body, schema);
+    if (result.error) return res.status(400).send(result.error.details[0].message);
+    user.email = email;
+    user.password = password;
+    user.permission = permission;
+    user.save();
+    return res.send(user);
+  } catch (err) {
+    throw err;
+  }
+});
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await Users.findByIdAndDelete(id);
+    if (!user) return res.status(400).send('error');
+    return res.send(user);
+  } catch (err) {
+    throw err;
+  }
+});
+
 
 module.exports = router;
