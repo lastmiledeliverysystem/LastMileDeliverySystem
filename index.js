@@ -1,24 +1,17 @@
-const express= require('express');
-const mongoose = require ('mongoose');
+const express = require('express');
+const mongoose = require('mongoose');
+const userController = require('./api/Controllers/UsersController');
+
 const app = express();
-const customers = require('./Models/customers');
-const vendor = require('./Models/vendor');
-const users = require('./Models/users');
-const orders = require('./Models/orders');
-const products = require('./Models/products');
+app.use(express.json());
+app.use('/api/users', userController);
+// const uri = 'mongodb+srv://kay:project#1@cluster0.mongodb.net/admin';
+// const con3 = 'mongodb://Rawan:project#1@host1:port1,/LastMileDelivery?authSource=admin&...';
+// const con = 'mongodb+srv://Rawan:project#1@cluster0-yszas.mongodb.net/LastMileDelivery?retryWrites=true';
+const con2 = 'mongodb://Kassim:project@cluster0-shard-00-00-yszas.mongodb.net:27017,cluster0-shard-00-01-yszas.mongodb.net:27017,cluster0-shard-00-02-yszas.mongodb.net:27017/LastMileDelivery?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true';
 
-
-const uri = "mongodb+srv://kay:project#1@cluster0.mongodb.net/admin";
-const con3 = "mongodb://Rawan:project#1@host1:port1,/LastMileDelivery?authSource=admin&...";
-const con = "mongodb+srv://Rawan:project#1@cluster0-yszas.mongodb.net/LastMileDelivery?retryWrites=true";
-const con2 = `mongodb://Kassim:project@cluster0-shard-00-00-yszas.mongodb.net:27017,cluster0-shard-00-01-yszas.mongodb.net:27017,cluster0-shard-00-02-yszas.mongodb.net:27017/LastMileDelivery?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true`
-
-
-mongoose.connect(con2,(err)=>{
-  if (err){ console.log(err)}
-  else {
-  console.log("Success");
-  }
+mongoose.connect(con2, (err) => {
+  (err) ? console.log(err) : console.log('Success')
 });
 
 const port = process.env.PORT || 8000;
