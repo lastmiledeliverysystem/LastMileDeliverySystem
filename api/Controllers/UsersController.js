@@ -17,6 +17,30 @@ const schema = Joi.object().keys({
 
 });
 
+const creatUser = async (user) => {
+  try {
+    const { email, password, permission } = user;
+    const result = Joi.validate(user, schema);
+    if (result.error) {
+      return ({
+        err: true,
+        data: result.error.details[0].message, 
+      });
+    }
+    const newUser = await Users.create({
+      email,
+      password,
+      permission,
+    });
+    return ({
+      err: false,
+      data: newUser,
+    });
+  } catch (err) {
+    throw err;
+  }
+};
+
 // get all users from DB
 router.get('/', async (req, res) => {
   try {
@@ -41,15 +65,8 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { email, password, permission } = req.body;
-    const result = Joi.validate(req.body, schema);
-    if (result.error) return res.status(400).send(result.error.details[0].message);
-    const user = await Users.create({
-      email,
-      password,
-      permission,
-    });
-    return res.send(user);
+    const result = creatUser(req.body);
+    return (result.err) ? res.status(400).send(result.data): res.send(result.data);
   } catch (err) {
     throw err;
   }
@@ -84,4 +101,4 @@ router.delete('/:id', async (req, res) => {
 });
 
 
-module.exports = router;
+module.exports = { router, creatUser };

@@ -5,7 +5,7 @@ const vendorController = require('./api/Controllers/VendorController');
 
 const app = express();
 app.use(express.json());
-app.use('/api/users', userController);
+app.use('/api/users', userController.router);
 app.use('/api/vendor', vendorController);
 // const uri = 'mongodb+srv://kay:project#1@cluster0.mongodb.net/admin';
 // const con3 = 'mongodb://Rawan:project#1@host1:port1,/LastMileDelivery?authSource=admin&...';
