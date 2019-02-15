@@ -95,7 +95,7 @@ router.get('/:id', async (req, res) => {
     const idValidationResult = Joi.validate(id, idValidationSchema);
     if (idValidationResult.error) return res.status(400).send('Customer ID is not Valid! ');
     const order = await Orders.findById(id);
-    if (_.isEmpty(order)) return res.send('Order not found');
+    if (_.isEmpty(order)) return res.send('Order is not found');
     return res.send(order);
   } catch (err) {
     throw err;
@@ -104,8 +104,7 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const result = createOrder(req.body);
-    console.log(result);
+    const result = await createOrder(req.body);
     return (result.err) ? res.status(400).send(result.data) : res.send(result.data);
   } catch (err) {
     throw err;

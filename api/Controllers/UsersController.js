@@ -68,7 +68,7 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const result = createUser(req.body);
+    const result = await createUser(req.body);
     return (result.err) ? res.status(400).send(result.data) : res.send(result.data);
   } catch (err) {
     throw err;
