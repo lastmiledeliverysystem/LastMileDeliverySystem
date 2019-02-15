@@ -3,12 +3,16 @@ const mongoose = require('mongoose');
 const userController = require('./api/Controllers/UsersController');
 const vendorController = require('./api/Controllers/VendorController');
 const customerController = require('./api/Controllers/CustomerController');
+const orderController = require('./api/Controllers/OrderController');
+
 
 const app = express();
 app.use(express.json());
 app.use('/api/users', userController.router);
 app.use('/api/vendor', vendorController);
 app.use('/api/customer', customerController);
+app.use('/api/order', orderController);
+
 // const uri = 'mongodb+srv://kay:project#1@cluster0.mongodb.net/admin';
 // const con3 = 'mongodb://Rawan:project#1@host1:port1,/LastMileDelivery?authSource=admin&...';
 // const con = 'mongodb+srv://Rawan:project#1@cluster0-yszas.mongodb.net/LastMileDelivery?retryWrites=true';

@@ -17,7 +17,7 @@ const schema = Joi.object().keys({
 
 });
 
-const creatUser = async (user) => {
+const createUser = async (user) => {
   try {
     const { email, password, permission } = user;
     const result = Joi.validate(user, schema);
@@ -55,6 +55,9 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
+    const idValidationSchema = Joi.objectId().required();
+    const idValidationResult = Joi.validate(id, idValidationSchema);
+    if (idValidationResult.error) return res.status(400).send('Customer ID is not Valid! ');
     const user = await Users.findById(id);
     if (_.isEmpty(user)) return res.send('User not found');
     return res.send(user);
@@ -65,8 +68,8 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const result = creatUser(req.body);
-    return (result.err) ? res.status(400).send(result.data): res.send(result.data);
+    const result = createUser(req.body);
+    return (result.err) ? res.status(400).send(result.data) : res.send(result.data);
   } catch (err) {
     throw err;
   }
@@ -76,6 +79,11 @@ router.put('/:id', async (req, res) => {
   try {
     const { email, password, permission } = req.body;
     const { id } = req.params;
+    // Validate ID
+    const idValidationSchema = Joi.objectId().required();
+    const idValidationResult = Joi.validate(id, idValidationSchema);
+    if (idValidationResult.error) return res.status(400).send('Customer ID is not Valid! ');
+    // Search and update
     const user = await Users.findById(id);
     if (_.isEmpty(user)) return res.status(404).send('User not found');
     const result = Joi.validate(req.body, schema);
@@ -92,8 +100,11 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
+    const idValidationSchema = Joi.objectId().required();
+    const idValidationResult = Joi.validate(id, idValidationSchema);
+    if (idValidationResult.error) return res.status(400).send('Customer ID is not Valid! ');
     const user = await Users.findByIdAndDelete(id);
-    if (!user) return res.status(400).send('error');
+    if (!user) return res.status(400).send('Error');
     return res.send(user);
   } catch (err) {
     throw err;
@@ -101,4 +112,4 @@ router.delete('/:id', async (req, res) => {
 });
 
 
-module.exports = { router, creatUser };
+module.exports = { router, createUser };
