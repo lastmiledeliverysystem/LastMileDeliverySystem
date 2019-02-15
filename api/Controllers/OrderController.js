@@ -93,7 +93,7 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params;
     const idValidationSchema = Joi.objectId().required();
     const idValidationResult = Joi.validate(id, idValidationSchema);
-    if (idValidationResult.error) return res.status(400).send('Customer ID is not Valid! ');
+    if (idValidationResult.error) return res.status(400).send('Order ID is not Valid! ');
     const order = await Orders.findById(id);
     if (_.isEmpty(order)) return res.send('Order is not found');
     return res.send(order);
@@ -118,10 +118,10 @@ router.put('/:id', async (req, res) => {
     // Validate ID
     const idValidationSchema = Joi.objectId().required();
     const idValidationResult = Joi.validate(id, idValidationSchema);
-    if (idValidationResult.error) return res.status(400).send('Customer ID is not Valid! ');
+    if (idValidationResult.error) return res.status(400).send('Order ID is not Valid! ');
     // Search and update
     const order = await Orders.findById(id);
-    if (_.isEmpty(order)) return res.status(404).send('Order not found');
+    if (_.isEmpty(order)) return res.status(404).send('Order is not found');
     const result = Joi.validate(req.body, schema);
     if (result.error) return res.status(400).send(result.error.details[0].message);
     order.status = status;
@@ -138,9 +138,9 @@ router.delete('/:id', async (req, res) => {
     const { id } = req.params;
     const idValidationSchema = Joi.objectId().required();
     const idValidationResult = Joi.validate(id, idValidationSchema);
-    if (idValidationResult.error) return res.status(400).send('Customer ID is not Valid! ');
+    if (idValidationResult.error) return res.status(400).send('Order ID is not Valid! ');
     const order = await Orders.findByIdAndDelete(id);
-    if (!order) return res.status(400).send('Error');
+    if (!order) return res.status(400).send('Order is not found');
     return res.send(order);
   } catch (err) {
     throw err;
