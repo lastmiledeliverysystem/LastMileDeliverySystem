@@ -1,13 +1,19 @@
 const express = require('express');
 const _ = require('lodash');
-const Joi = require('joi');
+const BaseJoi = require('joi');
+const Extension = require('joi-date-extensions');
+
+const Joi = BaseJoi.extend(Extension);
 Joi.objectId = require('joi-objectid')(Joi);
 
 const Orders = require('../Models/Orders');
 
 const router = express.Router();
 const schema = Joi.object().keys({
-  date: Joi.string(),
+  salesOrderNumber: Joi.objectId(),
+  robotId: Joi.objectId(),
+  customerId: Joi.objectId(),
+  date: Joi.date().format('DD-MM-YYYY'),
   status: Joi.string().required(),
   items: Joi.object().keys({
     name: Joi.string().required(),
@@ -28,9 +34,9 @@ const schema = Joi.object().keys({
     city: Joi.string().required(),
     zip: Joi.string().required(),
   }),
-  shippmentDate: Joi.string(),
-  deliveryDate: Joi.string(),
+  shippmentDate: Joi.date().format('DD-MM-YYYY'),
   trackingPassword: Joi.string().regex(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/).required(),
+  deliveryDate: Joi.date().format('DD-MM-YYYY'),
   paymentMethod: Joi.string().required(),
 
 });
@@ -115,20 +121,17 @@ router.put('/:id', async (req, res) => {
   try {
     const { status, items, address, deliveryDate } = req.body;
     const { id } = req.params;
+    const order = { status, items, address, deliveryDate };
     // Validate ID
     const idValidationSchema = Joi.objectId().required();
     const idValidationResult = Joi.validate(id, idValidationSchema);
     if (idValidationResult.error) return res.status(400).send('Order ID is not Valid! ');
     // Search and update
-    const order = await Orders.findById(id);
-    if (_.isEmpty(order)) return res.status(404).send('Order is not found');
+    const updatedOrder = await Orders.findByIdAndUpdate(id, order);
+    if (_.isEmpty(updatedOrder)) return res.status(404).send('Order is not found');
     const result = Joi.validate(req.body, schema);
     if (result.error) return res.status(400).send(result.error.details[0].message);
-    order.status = status;
-    order.items = items;
-    order.address = address;
-    order.deliveryDate = deliveryDate;
-    return res.send(order.save());
+    return res.send(order);
   } catch (err) {
     throw err;
   }

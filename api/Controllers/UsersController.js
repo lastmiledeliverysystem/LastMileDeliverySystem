@@ -79,19 +79,16 @@ router.put('/:id', async (req, res) => {
   try {
     const { email, password, permission } = req.body;
     const { id } = req.params;
+    const user = { email, password, permission };
     // Validate ID
     const idValidationSchema = Joi.objectId().required();
     const idValidationResult = Joi.validate(id, idValidationSchema);
     if (idValidationResult.error) return res.status(400).send('Customer ID is not Valid! ');
     // Search and update
-    const user = await Users.findById(id);
-    if (_.isEmpty(user)) return res.status(404).send('User not found');
+    const updatedUser = await Users.findByIdAndUpdate(id, user);
+    if (_.isEmpty(updatedUser)) return res.status(404).send('User not found');
     const result = Joi.validate(req.body, schema);
     if (result.error) return res.status(400).send(result.error.details[0].message);
-    user.email = email;
-    user.password = password;
-    user.permission = permission;
-    user.save();
     return res.send(user);
   } catch (err) {
     throw err;

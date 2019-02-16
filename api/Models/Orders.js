@@ -1,15 +1,15 @@
 const mongoose = require('mongoose');
 
 const orders = new mongoose.Schema({
-  //salesOrderNumber: mongoose.Schema.Types.ObjectId,
-  //robotId: mongoose.Schema.Types.ObjectId,
-  date: String,
+  salesOrderNumber: mongoose.Schema.Types.ObjectId,
+  robotId: mongoose.Schema.Types.ObjectId,
+  date: Date,
   status: {
     type: String,
     required: true,
   },
   items: {
-    //_id: mongoose.Schema.Types.ObjectId,
+    id: mongoose.Schema.Types.ObjectId,
     name: {
       type: String,
       required: true,
@@ -29,7 +29,7 @@ const orders = new mongoose.Schema({
     },
   },
 
-  //customerId:  mongoose.Schema.Types.ObjectId,
+  customerId: mongoose.Schema.Types.ObjectId,
   //{ type: mongoose.Schema.Types.ObjectId, refPath: < customerID Tablem >, required: true },
   discountAmount: Number,
   discount: Number,
@@ -59,11 +59,11 @@ const orders = new mongoose.Schema({
     },
   }],
   shippmentDate: {
-    type: String,
+    type: Date,
     required: false,
   },
   deliveryDate: {
-    type: String,
+    type: Date,
     required: false,
   },
   trackingPassword: {
