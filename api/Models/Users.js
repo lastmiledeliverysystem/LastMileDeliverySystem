@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
-
+const mongoosePaginate = require('mongoose-paginate');
 
 const users = new mongoose.Schema({
   email: {
     type: String,
     required: true,
     match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address'],
+    unique: true,
   },
   password: {
     type: String,
@@ -18,6 +19,8 @@ const users = new mongoose.Schema({
   },
 
 });
+users.plugin(mongoosePaginate);
+
 const Users = mongoose.model('Users', users);
 
 module.exports = Users;

@@ -29,8 +29,7 @@ const orders = new mongoose.Schema({
     },
   },
 
-  customerId: mongoose.Schema.Types.ObjectId,
-  //{ type: mongoose.Schema.Types.ObjectId, refPath: < customerID Tablem >, required: true },
+  customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'customers', required: true },
   discountAmount: Number,
   discount: Number,
   shippingCharge: Number,
@@ -71,12 +70,12 @@ const orders = new mongoose.Schema({
     required: true,
     match: /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/,
   },
+  vendorId: { type: mongoose.Schema.Types.ObjectId, ref: 'vendors', required: true },
+  // paymentId: { type: mongoose.Schema.Types.ObjectId, ref: 'paymentcards', required: true },
   paymentMethod: {
     type: String,
     required: true,
   },
-  //paymentId: mongoose.Schema.Types.ObjectId,
-  //vendorId:  mongoose.Schema.Types.ObjectId
 
 });
 const Orders = mongoose.model('Orders', orders);

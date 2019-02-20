@@ -4,11 +4,8 @@ const userController = require('./api/Controllers/UsersController');
 const vendorController = require('./api/Controllers/VendorController');
 const customerController = require('./api/Controllers/CustomerController');
 const orderController = require('./api/Controllers/OrderController');
-<<<<<<< HEAD
 const paymentCardsController = require('./api/Controllers/PaymentCardsController');
-=======
 const productController = require('./api/Controllers/productController');
->>>>>>> b4b2bda1c8fd7606e82903d4be6051de93baa087
 
 
 const app = express();
@@ -17,12 +14,8 @@ app.use('/api/users', userController.router);
 app.use('/api/vendor', vendorController);
 app.use('/api/customer', customerController);
 app.use('/api/order', orderController);
-<<<<<<< HEAD
 app.use('/api/paymentCard', paymentCardsController);
-
-=======
 app.use('/api/products', productController);
->>>>>>> b4b2bda1c8fd7606e82903d4be6051de93baa087
 
 // const uri = 'mongodb+srv://kay:project#1@cluster0.mongodb.net/admin';
 // const con3 = 'mongodb://Rawan:project#1@host1:port1,/LastMileDelivery?authSource=admin&...';

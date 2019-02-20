@@ -1,5 +1,7 @@
 const express = require('express');
 const _ = require('lodash');
+const url = require('url');
+
 const BaseJoi = require('joi');
 const Extension = require('joi-date-extensions');
 
@@ -9,7 +11,11 @@ Joi.objectId = require('joi-objectid')(Joi);
 const Orders = require('../Models/Orders');
 
 const router = express.Router();
+
+
 const schema = Joi.object().keys({
+  // paymentId: Joi.objectId(),
+  vendorId: Joi.objectId(),
   salesOrderNumber: Joi.objectId(),
   robotId: Joi.objectId(),
   customerId: Joi.objectId(),
@@ -41,11 +47,7 @@ const schema = Joi.object().keys({
 
 });
 
-// customerId:  mongoose.Schema.Types.ObjectId,
-// { type: mongoose.Schema.Types.ObjectId, refPath: < customerID Tablem >, required: true },
 
-// paymentId: mongoose.Schema.Types.ObjectId,
-// vendorId:  mongoose.Schema.Types.ObjectId
 
 
 const createOrder = async (order) => {
@@ -83,12 +85,64 @@ const createOrder = async (order) => {
   }
 };
 
+// Sorting
+router.get('/sort', async (req, res) => {
+  try {
+    const orders = await Orders.find().sort({ date: 1 });
+    if (_.isEmpty(orders)) return res.send('No orders');
+    return res.send(orders);
+  } catch (err) {
+    throw err;
+  }
+});
+
+// Pagination
+router.get('/paging/', async (req, res) => {
+  try {
+    const pageNumber = 1;
+    const pageSize = 2;
+    const order = await Orders.find({})
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize);
+    if (_.isEmpty(order)) return res.send('No orders');
+    return res.send(order);
+  } catch (err) {
+    throw err;
+  }
+});
+// Filtering
+router.get('/filter/', async (req, res) => {
+  try {
+    const order = await Orders.find({})
+      .select({ date: 1, status: 1 });
+    if (_.isEmpty(order)) return res.send('No orders');
+    return res.send(order);
+  } catch (err) {
+    throw err;
+  }
+});
 // get all orders from DB
 router.get('/', async (req, res) => {
   try {
     const orders = await Orders.find({});
     if (_.isEmpty(orders)) return res.send('No orders');
     return res.send(orders);
+  } catch (err) {
+    throw err;
+  }
+});
+// Pagination
+router.get('/paging/?pageNumber=1&pageSize=1/', async (req, res) => {
+  try {
+    const q = url.parse('/paging/?pageNumber=1&pageSize=1', true);
+    const queryData = q.query; // returns an object: { year: 2017, month: 'february' }
+    console.log(queryData);
+    const { pageNumber, pageSize } = queryData;
+    console.log("here", pageNumber, pageSize);
+    const user = await Orders.paginate({}, { page: pageNumber, limit: pageSize }, (err, result) => {
+      if (_.isEmpty(user)) return res.send('No users');
+      return result.pages;
+    });
   } catch (err) {
     throw err;
   }

@@ -40,8 +40,7 @@ router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const idValidationResult = Joi.validate(id, idValidationSchema);
-    if (idValidationResult.error)
-      return res.status(400).send('Customer ID is not Valid!');
+    if (idValidationResult.error) return res.status(400).send('Customer ID is not Valid!');
     const customer = await Customer.findById(id);
     if (_.isEmpty(customer)) return res.send('Customer Not Found!');
     return res.send(customer);
