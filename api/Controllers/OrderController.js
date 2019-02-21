@@ -47,9 +47,6 @@ const schema = Joi.object().keys({
 
 });
 
-
-
-
 const createOrder = async (order) => {
   try {
     const { date, status, items, discountAmount, discount, shippingCharge, total, notes, address,
@@ -85,42 +82,7 @@ const createOrder = async (order) => {
   }
 };
 
-// Sorting
-router.get('/sort', async (req, res) => {
-  try {
-    const orders = await Orders.find().sort({ date: 1 });
-    if (_.isEmpty(orders)) return res.send('No orders');
-    return res.send(orders);
-  } catch (err) {
-    throw err;
-  }
-});
 
-// Pagination
-router.get('/paging/', async (req, res) => {
-  try {
-    const pageNumber = 1;
-    const pageSize = 2;
-    const order = await Orders.find({})
-      .skip((pageNumber - 1) * pageSize)
-      .limit(pageSize);
-    if (_.isEmpty(order)) return res.send('No orders');
-    return res.send(order);
-  } catch (err) {
-    throw err;
-  }
-});
-// Filtering
-router.get('/filter/', async (req, res) => {
-  try {
-    const order = await Orders.find({})
-      .select({ date: 1, status: 1 });
-    if (_.isEmpty(order)) return res.send('No orders');
-    return res.send(order);
-  } catch (err) {
-    throw err;
-  }
-});
 // get all orders from DB
 router.get('/', async (req, res) => {
   try {
@@ -132,22 +94,41 @@ router.get('/', async (req, res) => {
   }
 });
 // Pagination
-router.get('/paging/?pageNumber=1&pageSize=1/', async (req, res) => {
+router.get('/paging', async (req, res) => {
   try {
-    const q = url.parse('/paging/?pageNumber=1&pageSize=1', true);
-    const queryData = q.query; // returns an object: { year: 2017, month: 'february' }
-    console.log(queryData);
-    const { pageNumber, pageSize } = queryData;
-    console.log("here", pageNumber, pageSize);
-    const user = await Orders.paginate({}, { page: pageNumber, limit: pageSize }, (err, result) => {
-      if (_.isEmpty(user)) return res.send('No users');
-      return result.pages;
-    });
+    let { pageNumber, pageSize } = req.query;
+    pageNumber = parseInt(pageNumber);
+    pageSize = parseInt(pageSize);
+    const order = await Orders.find({}).skip((pageNumber - 1) * pageSize).limit(pageSize);
+    if (_.isEmpty(order)) return res.send('No orders');
+    return res.send(order);
   } catch (err) {
     throw err;
   }
 });
 
+// Sorting
+router.get('/sort', async (req, res) => {
+  try {
+    const orders = await Orders.find().sort({ date: 1 });
+    if (_.isEmpty(orders)) return res.send('No orders');
+    return res.send(orders);
+  } catch (err) {
+    throw err;
+  }
+});
+
+// Filtering
+router.get('/filter', async (req, res) => {
+  try {
+    const order = await Orders.find({})
+      .select({ date: 1, status: 1 });
+    if (_.isEmpty(order)) return res.send('No orders');
+    return res.send(order);
+  } catch (err) {
+    throw err;
+  }
+});
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;

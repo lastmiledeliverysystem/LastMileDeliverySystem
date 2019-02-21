@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const mongoosePaginate = require('mongoose-paginate');
 
 const users = new mongoose.Schema({
   email: {
@@ -19,7 +18,6 @@ const users = new mongoose.Schema({
   },
 
 });
-users.plugin(mongoosePaginate);
 
 const Users = mongoose.model('Users', users);
 

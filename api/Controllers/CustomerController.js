@@ -23,7 +23,7 @@ const customerSchema = Joi.object().keys({
   phone: Joi.string().required(),
   birthDate: Joi.date().required(),
   imageURL: Joi.string(),
-  address: adressSchema
+  address: adressSchema,
 });
 // GET all customers
 router.get('/', async (req, res) => {
@@ -35,7 +35,42 @@ router.get('/', async (req, res) => {
     throw err;
   }
 });
+// Pagination
+router.get('/paging', async (req, res) => {
+  try {
+    let { pageNumber, pageSize } = req.query;
+    pageNumber = parseInt(pageNumber);
+    pageSize = parseInt(pageSize);
+    const customer = await Customer.find({}).skip((pageNumber - 1) * pageSize).limit(pageSize);
+    if (_.isEmpty(customer)) return res.send('No customers');
+    return res.send(customer);
+  } catch (err) {
+    throw err;
+  }
+});
 
+// Sorting
+router.get('/sort', async (req, res) => {
+  try {
+    const customer = await Customer.find({}).sort({ fName: 1 });
+    if (_.isEmpty(customer)) return res.send('No customers');
+    return res.send(customer);
+  } catch (err) {
+    throw err;
+  }
+});
+
+// Filtering
+router.get('/filter', async (req, res) => {
+  try {
+    const customer = await Customer.find({})
+      .select({ fName: 1 });
+    if (_.isEmpty(customer)) return res.send('No customers');
+    return res.send(customer);
+  } catch (err) {
+    throw err;
+  }
+});
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -60,14 +95,13 @@ router.post('/', async (req, res) => {
       phone,
       birthDate,
       imageURL,
-      address
+      address,
     } = req.body;
     const customer = { fName, lName, phone, birthDate, imageURL, address };
     const customerValidationResult = Joi.validate(customer, customerSchema);
-    if (customerValidationResult.error)
-      return res
-        .status(400)
-        .send(customerValidationResult.error.details[0].message);
+    if (customerValidationResult.error) {return res
+      .status(400)
+      .send(customerValidationResult.error.details[0].message);}
     const newCustomer = await Customer.create(customer);
     const newUser = await creatUser({
       email,

@@ -1,5 +1,4 @@
 const express = require('express');
-const url = require('url');
 const _ = require('lodash');
 const Joi = require('joi');
 
@@ -55,29 +54,21 @@ router.get('/', async (req, res) => {
   }
 });
 // Pagination
-router.get('/paging?pageNumber=1&pageSize=1/', async (req, res) => {
-//   try {
-//     const user = await Users.find().skip(1).limit(1);
-//     if (_.isEmpty(user)) return res.send('No users');
-//     return res.send(user);
-//   } catch (err) {
-//     throw err;
-//   }
-// });
+router.get('/paging', async (req, res) => {
   try {
-    const q = url.parse('/paging/?pageNumber=1&pageSize=1', true);
-    const queryData = q.query; // returns an object: { year: 2017, month: 'february' }
-    const { pageNumber, pageSize } = queryData;
-    const user = await Users.paginate({}, { page: pageNumber, limit: pageSize }, (err, result) => {
-      if (_.isEmpty(user)) return res.send('No users');
-      return result.pages;
-    });
+    let { pageNumber, pageSize } = req.query;
+    pageNumber = parseInt(pageNumber);
+    pageSize = parseInt(pageSize);
+    const user = await Users.find({}).skip((pageNumber - 1) * pageSize).limit(pageSize);
+    if (_.isEmpty(user)) return res.send('No users');
+    return res.send(user);
   } catch (err) {
     throw err;
   }
 });
+
 // Sorting
-router.get('/sort/', async (req, res) => {
+router.get('/sort', async (req, res) => {
   try {
     const user = await Users.find({}).sort({ email: 1 });
     if (_.isEmpty(user)) return res.send('No users');
@@ -87,9 +78,8 @@ router.get('/sort/', async (req, res) => {
   }
 });
 
-
 // Filtering
-router.get('/filter/', async (req, res) => {
+router.get('/filter', async (req, res) => {
   try {
     const user = await Users.find({})
       .select({ email: 1 });
@@ -99,6 +89,7 @@ router.get('/filter/', async (req, res) => {
     throw err;
   }
 });
+
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -113,7 +104,6 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-
 router.post('/', async (req, res) => {
   try {
     const result = await createUser(req.body);
@@ -121,7 +111,7 @@ router.post('/', async (req, res) => {
       return res.send(result.data);
     }
   } catch (err) {
-    return res.send('Duplicated email');
+    return res.send('Duplicated Email');
     // throw err;
   }
 });

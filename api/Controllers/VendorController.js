@@ -44,6 +44,42 @@ router.get('/', async (req, res) => {
     throw err;
   }
 });
+// Pagination
+router.get('/paging', async (req, res) => {
+  try {
+    let { pageNumber, pageSize } = req.query;
+    pageNumber = parseInt(pageNumber);
+    pageSize = parseInt(pageSize);
+    const vendors = await Vendor.find({}).skip((pageNumber - 1) * pageSize).limit(pageSize);
+    if (_.isEmpty(vendors)) return res.send('No vendors');
+    return res.send(vendors);
+  } catch (err) {
+    throw err;
+  }
+});
+
+// Sorting
+router.get('/sort', async (req, res) => {
+  try {
+    const vendors = await Vendor.find({}).sort({ name: 1 });
+    if (_.isEmpty(vendors)) return res.send('No vendors');
+    return res.send(vendors);
+  } catch (err) {
+    throw err;
+  }
+});
+
+// Filtering
+router.get('/filter', async (req, res) => {
+  try {
+    const vendors = await Vendor.find({})
+      .select({ name: 1 });
+    if (_.isEmpty(vendors)) return res.send('No vendors');
+    return res.send(vendors);
+  } catch (err) {
+    throw err;
+  }
+});
 
 router.get('/:id', async (req, res) => {
   try {
