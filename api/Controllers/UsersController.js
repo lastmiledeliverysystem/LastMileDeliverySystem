@@ -107,9 +107,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const result = await createUser(req.body);
-    if (!result.err) {
-      return res.send(result.data);
-    }
+    return (result.err) ? res.status(400).send(result.data) : res.send(result.data);
   } catch (err) {
     return res.send('Duplicated Email');
     // throw err;
