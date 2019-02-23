@@ -4,7 +4,9 @@ const mongoose = require('mongoose');
 const vendor = new mongoose.Schema({
   vendorId: mongoose.Schema.Types.ObjectId,
   name: {
-    type: String, required: true,
+    type: String,
+    required: true,
+    unique: true,
   },
   category: {
     type: String, required: true,
