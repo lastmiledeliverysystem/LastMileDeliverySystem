@@ -108,7 +108,10 @@ router.post('/', async (req, res) => {
     } = req.body;
     const result = Joi.validate(req.body, vendorSchema);
     if (result.error) return res.status(400).send(result.error.details[0].message);
-    const vendor = await Vendor.create({
+
+    let vendor = await Vendor.findOne({ name: req.body.name });
+    if (vendor) return res.status(400).send('Duplicated name!');
+    vendor = await Vendor.create({
       name,
       category,
       phone,

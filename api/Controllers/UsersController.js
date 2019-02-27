@@ -1,3 +1,6 @@
+const config = require('config');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const express = require('express');
 const _ = require('lodash');
 const Joi = require('joi');
@@ -106,11 +109,17 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
+    const user = await Users.findOne({ email: req.body.email });
+    if (user) return res.status(400).send('User already registered');   
+    const salt = await bcrypt.genSalt(10);
+    req.body.password = await bcrypt.hash(req.body.password, salt);
+
     const result = await createUser(req.body);
-    return (result.err) ? res.status(400).send(result.data) : res.send(result.data);
+    const token = jwt.sign({ _id: user.id }, config.get('jwtPrivateKey'));
+
+    return (result.err) ? res.status(400).send(result.data) : res.header('x-auth-token', token).send(result.data);
   } catch (err) {
-    return res.send('Duplicated Email');
-    // throw err;
+    throw err;
   }
 });
 

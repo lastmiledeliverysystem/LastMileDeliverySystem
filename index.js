@@ -1,3 +1,4 @@
+const config = require('config');
 const express = require('express');
 const mongoose = require('mongoose');
 const userController = require('./api/Controllers/UsersController');
@@ -6,8 +7,12 @@ const customerController = require('./api/Controllers/CustomerController');
 const orderController = require('./api/Controllers/OrderController');
 const paymentCardsController = require('./api/Controllers/PaymentCardsController');
 const productController = require('./api/Controllers/productController');
+const auth = require('./api/Controllers/auth');
 
-
+if (!config.get('jwtPrivateKey')) {
+  console.error('FATAL ERROR: jwtPrivateKey is not defined');
+  process.exit(1);
+}
 const app = express();
 app.use(express.json());
 app.use('/api/users', userController.router);
@@ -16,6 +21,7 @@ app.use('/api/customer', customerController);
 app.use('/api/order', orderController);
 app.use('/api/paymentCard', paymentCardsController);
 app.use('/api/products', productController);
+app.use('/api/auth', auth);
 
 // const uri = 'mongodb+srv://kay:project#1@cluster0.mongodb.net/admin';
 // const con3 = 'mongodb://Rawan:project#1@host1:port1,/LastMileDelivery?authSource=admin&...';
