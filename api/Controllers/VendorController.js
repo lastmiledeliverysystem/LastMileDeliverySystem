@@ -131,8 +131,8 @@ router.post('/', async (req, res) => {
     const newUser = await creatUser(user);
     return newUser.err ? res.status(400).send(newUser.data) : res.send(vendor);
   } catch (err) {
-    //throw err;
-    return res.send('Duplicated vendor name');
+    throw err;
+   
   }
 });
 
