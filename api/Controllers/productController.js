@@ -6,6 +6,8 @@ const Products = require('../Models/Products');
 
 const router = express.Router();
 const auth = require('../../middleware/auth');
+const admin = require('../../middleware/admin');
+
 
 
 const productSchema = Joi.object().keys({
@@ -104,7 +106,7 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', [auth, admin], async (req, res) => {
   try {
     const { id } = req.params;
     const idValidationSchema = Joi.objectId().required();

@@ -182,6 +182,21 @@ router.delete('/:id', async (req, res) => {
     throw err;
   }
 });
+//delet item
+router.delete('/item/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const idValidationSchema = Joi.objectId().required();
+    const idValidationResult = Joi.validate(id, idValidationSchema);
+    if (idValidationResult.error) return res.status(400).send('Order ID is not Valid! ');
+    const order = await Orders.findByIdAndDelete(id);
+    if (!order) return res.status(400).send('Order is not found');
+    return res.send(order);
+  } catch (err) {
+    throw err;
+  }
+});
+
 
 
 module.exports = router;

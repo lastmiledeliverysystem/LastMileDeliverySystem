@@ -18,11 +18,12 @@ const users = new mongoose.Schema({
     id: { type: mongoose.Schema.Types.ObjectId, refPath: 'permission.role', required: true },
     role: { type: String, required: true },
   },
-
+  isVendor: Boolean,
+  isCustomer: Boolean,
 });
 
 users.methods.generateAuthToken= function(){
-  const token =jwt.sign({ _id:this._id }, config.get('jwtPrivateKey'));
+  const token =jwt.sign({ _id:this._id, isVendor: this.isVendor, isCustomer: this.isCustomer }, config.get('jwtPrivateKey'));
   return token;
 }
 
