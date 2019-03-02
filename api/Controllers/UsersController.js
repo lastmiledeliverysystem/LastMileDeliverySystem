@@ -1,11 +1,12 @@
-const config = require('config');
-const jwt = require('jsonwebtoken');
+// const config = require('config');
+// const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const express = require('express');
 const _ = require('lodash');
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 const Users = require('../Models/Users');
+const auth = require('../../middleware/auth');
 
 const router = express.Router();
 const schema = Joi.object().keys({
@@ -45,6 +46,14 @@ const schema = Joi.object().keys({
 //   }
 // };
 
+router.get('/me', auth, async (req, res) => {
+  try {
+    const user = await Users.findById(req.user._id).select('-password');
+    return res.send(user);
+  } catch (err) {
+    throw err;
+  }
+});
 
 // get all users from DB
 router.get('/', async (req, res) => {
@@ -110,37 +119,49 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     let user = await Users.findOne({ email: req.body.email });
-    if (user) return res.status(400).send('User already registered'); 
+    if (user) return res.status(400).send('User already registered');
 
     const salt = await bcrypt.genSalt(10);
     req.body.password = await bcrypt.hash(req.body.password, salt);
 
-    const{
+    const {
       email,
       password,
-      permission
-    }=req.body;
+      permission,
+    } = req.body;
 
-    user={email,password,permission};
+    user = { email, password, permission };
     const result = Joi.validate(user, schema);
     if (result.error) {
       return (res
         .status(400)
         .send(result.error.details[0].message));
-      };
+    }
     const newUser = await Users.create({
-        email,
-        password,
-        permission,
-      });
+      email,
+      password,
+      permission,
+    });
 
-    //const result = await createUser(req.body);
+    // const result = await createUser(req.body);
     const token = newUser.generateAuthToken();
-    return (newUser.err) ? 
-    res.status(400).send(newUser.data) 
-    : res.header('x-auth-token',token).send(newUser);
-  }catch (err) {
+    return (newUser.err) ? res.status(400).send(newUser.data)
+      : res.header('x-auth-token', token).send(newUser);
+  } catch (err) {
     throw err;
+  }
+});
+
+router.get('/logout', auth, (req, res, next) => {
+  if (req.session) {
+    // delete session object
+    req.session.destroy(function(err) {
+      if (err) {
+        return next(err);
+      } else {
+        return res.redirect('/');
+      }
+    });
   }
 });
 
@@ -178,4 +199,4 @@ router.delete('/:id', async (req, res) => {
 });
 
 
-module.exports = { router};
+module.exports = { router };

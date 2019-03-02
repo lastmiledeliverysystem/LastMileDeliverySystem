@@ -16,10 +16,10 @@ if (!config.get('jwtPrivateKey')) {
 const app = express();
 app.use(express.json());
 app.use('/api/users', userController.router);
-app.use('/api/vendor', vendorController);
-app.use('/api/customer', customerController);
-app.use('/api/order', orderController);
-app.use('/api/paymentCard', paymentCardsController);
+app.use('/api/vendors', vendorController);
+app.use('/api/customers', customerController);
+app.use('/api/orders', orderController);
+app.use('/api/paymentCards', paymentCardsController);
 app.use('/api/products', productController);
 app.use('/api/auth', auth);
 
