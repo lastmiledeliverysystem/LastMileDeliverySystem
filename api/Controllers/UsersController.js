@@ -17,6 +17,7 @@ const schema = Joi.object().keys({
     id: Joi.objectId().required(),
     role: Joi.string().required(),
   }),
+  logoutToken: Joi.string(),
 
 });
 
@@ -101,7 +102,19 @@ router.get('/filter', async (req, res) => {
     throw err;
   }
 });
-
+router.get('/logout/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const idValidationSchema = Joi.objectId().required();
+    const idValidationResult = Joi.validate(id, idValidationSchema);
+    if (idValidationResult.error) return res.status(400).send('Customer ID is not Valid! ');
+    const user = await Users.findByIdAndUpdate({ _id: id }, { $unset: { logoutToken: '' } });
+    if (_.isEmpty(user)) return res.send('User not found');
+    return res.send('Logged out!!');
+  } catch (err) {
+    throw err;
+  }
+});
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -119,6 +132,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     let user = await Users.findOne({ email: req.body.email });
+    user = await Users.findOne({ id: req.body.id })
     if (user) return res.status(400).send('User already registered');
 
     const salt = await bcrypt.genSalt(10);
@@ -137,14 +151,20 @@ router.post('/', async (req, res) => {
         .status(400)
         .send(result.error.details[0].message));
     }
-    const newUser = await Users.create({
+    let newUser = await Users.create({
       email,
       password,
       permission,
     });
 
     // const result = await createUser(req.body);
-    const token = newUser.generateAuthToken();
+    let token = newUser.generateAuthToken();
+    token = await bcrypt.hash(token, salt);
+    newUser = await Users.findByIdAndUpdate(newUser.id, {
+      logoutToken: token,
+    });
+    
+
     return (newUser.err) ? res.status(400).send(newUser.data)
       : res.header('x-auth-token', token).send(newUser);
   } catch (err) {
@@ -152,18 +172,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.get('/logout', auth, (req, res, next) => {
-  if (req.session) {
-    // delete session object
-    req.session.destroy(function(err) {
-      if (err) {
-        return next(err);
-      } else {
-        return res.redirect('/');
-      }
-    });
-  }
-});
+
 
 router.put('/:id', async (req, res) => {
   try {
