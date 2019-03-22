@@ -20,12 +20,14 @@ const users = new mongoose.Schema({
   },
   isVendor: Boolean,
   isCustomer: Boolean,
+  logoutToken: String,
 });
 
-users.methods.generateAuthToken= function(){
-  const token =jwt.sign({ _id:this._id, isVendor: this.isVendor, isCustomer: this.isCustomer }, config.get('jwtPrivateKey'));
+users.methods.generateAuthToken = function () {
+  const token = jwt.sign({ _id: this._id, isVendor: this.isVendor, isCustomer: this.isCustomer }, config.get('jwtPrivateKey'));
+
   return token;
-}
+};
 
 const Users = mongoose.model('Users', users);
 

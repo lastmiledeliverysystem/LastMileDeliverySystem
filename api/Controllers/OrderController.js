@@ -108,7 +108,11 @@ router.get('/paging', async (req, res) => {
 // Sorting
 router.get('/sort', async (req, res) => {
   try {
-    const orders = await Orders.find().sort({ date: 1 });
+    // console.log ( typeof (req.query.total));
+    const { sortBy } = req.query;
+    console.log(sortBy);
+    const q = {sortBy:1};
+    const orders = await Orders.find().sort(q);
     if (_.isEmpty(orders)) return res.send('No orders');
     return res.send(orders);
   } catch (err) {
