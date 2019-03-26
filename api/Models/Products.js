@@ -13,6 +13,7 @@ const products = new mongoose.Schema({
     sku: String,
     barCode: String,
     productId: Number,
+    vendorId: mongoose.Schema.Types.ObjectId,
     options: {
       image: { type: String, required: true },
       color: { type: String, required: true },

@@ -33,8 +33,8 @@ const vendor = new mongoose.Schema({
       type: String, required: true,
     },
   },
-  vendorProduct: {
-    type: String, required: true,
+  vendorProducts: {
+    type: mongoose.Schema.Types.ObjectId, required: true,
   },
 
 });
