@@ -21,31 +21,31 @@ const schema = Joi.object().keys({
 
 });
 
-// const createUser = async (user) => {
-//   try {
-//     const { email, password, permission } = user;
-//     const result = Joi.validate(user, schema);
-//     if (result.error) {
-//       return ({
-//         err: true,
-//         data: result.error.details[0].message,
-//       });
-//     }
-//     const newUser = await Users.create({
-//       email,
-//       password,
-//       permission,
-//     });
+const createUser = async (user) => {
+  try {
+    const { email, password, permission } = user;
+    const result = Joi.validate(user, schema);
+    if (result.error) {
+      return ({
+        err: true,
+        data: result.error.details[0].message,
+      });
+    }
+    const newUser = await Users.create({
+      email,
+      password,
+      permission,
+    });
 
-//     return ({
-//       err: false,
-//       data: newUser,
-//       _id:newUser._id,
-//     });
-//   } catch (err) {
-//     throw err;
-//   }
-// };
+    return ({
+      err: false,
+      data: newUser,
+      _id:newUser._id,
+    });
+  } catch (err) {
+    throw err;
+  }
+};
 
 router.get('/me', auth, async (req, res) => {
   try {
@@ -138,26 +138,29 @@ router.post('/', async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     req.body.password = await bcrypt.hash(req.body.password, salt);
 
-    const {
-      email,
-      password,
-      permission,
-    } = req.body;
+    // const {
+    //   email,
+    //   password,
+    //   permission,
+    // } = req.body;
 
-    user = { email, password, permission };
-    const result = Joi.validate(user, schema);
-    if (result.error) {
-      return (res
-        .status(400)
-        .send(result.error.details[0].message));
-    }
-    let newUser = await Users.create({
-      email,
-      password,
-      permission,
-    });
+    // user = { email, password, permission };
+    // const result = Joi.validate(user, schema);
+    // if (result.error) {
+    //   return (res
+    //     .status(400)
+    //     .send(result.error.details[0].message));
+    // }
+    // let newUser = await Users.create({
+    //   email,
+    //   password,
+    //   permission,
+    // });
 
-    // const result = await createUser(req.body);
+    const result = await createUser(req.body);
+    const newUser = result.data;
+    console.log(newUser);
+    
     let token = newUser.generateAuthToken();
     token = await bcrypt.hash(token, salt);
     newUser = await Users.findByIdAndUpdate(newUser.id, {
@@ -208,4 +211,4 @@ router.delete('/:id', async (req, res) => {
 });
 
 
-module.exports = { router };
+module.exports = { router, createUser };

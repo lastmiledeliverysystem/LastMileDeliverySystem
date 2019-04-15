@@ -3,7 +3,8 @@ const _ = require('lodash');
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 const Vendor = require('../Models/Vendor');
-const { creatUser } = require('../Controllers/UsersController');
+const Products = require('../Models/Products');
+const { createUser } = require('../Controllers/UsersController');
 
 const router = express.Router();
 
@@ -29,10 +30,9 @@ const vendorSchema = Joi.object().keys({
   name: Joi.string().required(),
   category: Joi.string().required(),
   phone: Joi.number().required(),
-  vendorType: Joi.strip().required(),
+  vendorType: Joi.string().required(),
   imageURL: Joi.string().required(),
   address: adressSchema,
-  vendorProduct: Joi.string().required(),
 });
 
 router.get('/', async (req, res) => {
@@ -104,8 +104,8 @@ router.post('/', async (req, res) => {
       vendorType,
       imageURL,
       address,
-      vendorProduct,
     } = req.body;
+    const vendorProducts = await Products.create({vendorProducts:[]})
     const result = Joi.validate(req.body, vendorSchema);
     if (result.error) return res.status(400).send(result.error.details[0].message);
 
@@ -118,7 +118,7 @@ router.post('/', async (req, res) => {
       vendorType,
       imageURL,
       address,
-      vendorProduct,
+      vendorProducts: vendorProducts.id
     });
     const user = {
       email,
@@ -128,7 +128,7 @@ router.post('/', async (req, res) => {
         role: 'Vendor',
       },
     };
-    const newUser = await creatUser(user);
+    const newUser = await createUser(user);
     return newUser.err ? res.status(400).send(newUser.data) : res.send(vendor);
   } catch (err) {
     throw err;
