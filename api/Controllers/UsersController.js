@@ -18,12 +18,14 @@ const schema = Joi.object().keys({
     role: Joi.string().required(),
   }),
   logoutToken: Joi.string(),
+  isCustomer: Joi.boolean(),
+  isVendor: Joi.boolean(),
 
 });
 
 const createUser = async (user) => {
   try {
-    const { email, password, permission } = user;
+    const { email, password, permission, isVendor, isCustomer } = user;
     const result = Joi.validate(user, schema);
     if (result.error) {
       return ({
@@ -31,16 +33,20 @@ const createUser = async (user) => {
         data: result.error.details[0].message,
       });
     }
+    const salt = await bcrypt.genSalt(10);
+    const encrypted = await bcrypt.hash(password, salt);
     const newUser = await Users.create({
       email,
-      password,
+      password: encrypted,
       permission,
+      isVendor,
+      isCustomer,
     });
 
     return ({
       err: false,
       data: newUser,
-      _id:newUser._id,
+      id: newUser.id,
     });
   } catch (err) {
     throw err;
@@ -49,7 +55,7 @@ const createUser = async (user) => {
 
 router.get('/me', auth, async (req, res) => {
   try {
-    const user = await Users.findById(req.user._id).select('-password');
+    const user = await Users.findById(req.user.id).select('-password');
     return res.send(user);
   } catch (err) {
     throw err;
@@ -131,52 +137,24 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    let user = await Users.findOne({ email: req.body.email });
-    user = await Users.findOne({ id: req.body.id })
+    const user = await Users.findOne({ email: req.body.email });
     if (user) return res.status(400).send('User already registered');
-
-    const salt = await bcrypt.genSalt(10);
-    req.body.password = await bcrypt.hash(req.body.password, salt);
-
-    // const {
-    //   email,
-    //   password,
-    //   permission,
-    // } = req.body;
-
-    // user = { email, password, permission };
-    // const result = Joi.validate(user, schema);
-    // if (result.error) {
-    //   return (res
-    //     .status(400)
-    //     .send(result.error.details[0].message));
-    // }
-    // let newUser = await Users.create({
-    //   email,
-    //   password,
-    //   permission,
-    // });
 
     const result = await createUser(req.body);
     const newUser = result.data;
-    console.log(newUser);
-    
-    let token = newUser.generateAuthToken();
-    token = await bcrypt.hash(token, salt);
-    newUser = await Users.findByIdAndUpdate(newUser.id, {
-      logoutToken: token,
-    });
-    
+    // let token = newUser.generateAuthToken();
+    // token = await bcrypt.hash(token, salt);
+    // newUser = await Users.findByIdAndUpdate(newUser.id, {
+    //   logoutToken: token,
+    // });
 
-    return (newUser.err) ? res.status(400).send(newUser.data)
-      : res.header('x-auth-token', token).send(newUser);
+    return (newUser.err)
+      ? res.status(400).send(newUser.data)
+      : res.send(newUser);
   } catch (err) {
     throw err;
   }
 });
-
-
-
 router.put('/:id', async (req, res) => {
   try {
     const { email, password, permission } = req.body;
