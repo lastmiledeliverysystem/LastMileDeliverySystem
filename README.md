@@ -1,7 +1,4 @@
-# LastMileDeliverySystem
-LastMileDeliverySystem
-# LastMileDeliverySystem
-LastMileDeliverySystem
+
 #`LMD E-commerce System`
 
 ***
