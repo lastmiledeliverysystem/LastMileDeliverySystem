@@ -127,6 +127,8 @@ router.post('/', async (req, res) => {
         id: vendor.id,
         role: 'Vendor',
       },
+      isVendor: true,
+      isCustomer: false,
     };
     const newUser = await createUser(user);
     return newUser.err ? res.status(400).send(newUser.data) : res.send(vendor);

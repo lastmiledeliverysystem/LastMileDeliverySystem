@@ -97,7 +97,9 @@ router.post('/', async (req, res) => {
       imageURL,
       address,
     } = req.body;
-    const customer = { fName, lName, phone, birthDate, imageURL, address };
+    const customer = {
+      fName, lName, phone, birthDate, imageURL, address,
+    };
     const customerValidationResult = Joi.validate(customer, customerSchema);
     if (customerValidationResult.error) {return res
       .status(400)
@@ -106,7 +108,9 @@ router.post('/', async (req, res) => {
     const newUser = await createUser({
       email,
       password,
-      permission: { id: newCustomer.id, role: 'customer' }
+      permission: { id: newCustomer.id, role: 'customer' },
+      isCustomer: true,
+      isVendor: false,
     });
     return newUser.err
       ? res.status(400).send(newUser.data)

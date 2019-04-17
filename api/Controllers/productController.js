@@ -6,9 +6,7 @@ const Products = require('../Models/Products');
 
 const router = express.Router();
 const auth = require('../../middleware/auth');
-const admin = require('../../middleware/admin');
-
-
+const isVendor = require('../../middleware/isVendor');
 
 const productSchema = Joi.object().keys({
   vendorProducts: Joi.array().items(Joi.object().keys({
@@ -106,9 +104,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-
-
-router.post('/', auth, async (req, res) => {
+router.post('/', [auth, isVendor], async (req, res) => {
   try {
     const { vendorProducts } = req.body;
     const productValidationResult = Joi.validate({ vendorProducts }, productSchema);
@@ -116,14 +112,13 @@ router.post('/', auth, async (req, res) => {
     const product = await Products.create({
       vendorProducts,
     });
-
     return res.send(product);
   } catch (err) {
     throw err;
   }
 });
 
-router.delete('/:id', [auth, admin], async (req, res) => {
+router.delete('/:id', [auth, isVendor], async (req, res) => {
   try {
     const { id } = req.params;
     const idValidationSchema = Joi.objectId().required();
