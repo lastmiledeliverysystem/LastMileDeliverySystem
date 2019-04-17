@@ -3,7 +3,7 @@ const _ = require('lodash');
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 const Customer = require('../Models/Customer');
-const { creatUser } = require('../Controllers/UsersController');
+const { createUser } = require('../Controllers/UsersController');
 
 const router = express.Router();
 
@@ -103,7 +103,7 @@ router.post('/', async (req, res) => {
       .status(400)
       .send(customerValidationResult.error.details[0].message);}
     const newCustomer = await Customer.create(customer);
-    const newUser = await creatUser({
+    const newUser = await createUser({
       email,
       password,
       permission: { id: newCustomer.id, role: 'customer' }

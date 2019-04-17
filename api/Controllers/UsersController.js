@@ -23,6 +23,8 @@ const schema = Joi.object().keys({
 
 const createUser = async (user) => {
   try {
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(user.password, salt);
     const { email, password, permission } = user;
     const result = Joi.validate(user, schema);
     if (result.error) {
@@ -169,7 +171,7 @@ router.post('/', async (req, res) => {
     
 
     return (newUser.err) ? res.status(400).send(newUser.data)
-      : res.header('x-auth-token', token).send(newUser);
+      : res.set('x-auth-token', token).send(newUser);
   } catch (err) {
     throw err;
   }

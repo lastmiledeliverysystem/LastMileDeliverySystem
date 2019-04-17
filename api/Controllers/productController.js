@@ -77,12 +77,27 @@ router.get('/filter', async (req, res) => {
     throw err;
   }
 });
-router.get('/:id', async (req, res) => {
+
+router.get('/product/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const idValidationSchema = Joi.objectId().required();
     const idValidationResult = Joi.validate(id, idValidationSchema);
     if (idValidationResult.error) return res.status(400).send('Product ID is not Valid! ');
+    const product = await Products.find({'vendorProducts._id':id},{'vendorProducts.$': 1});
+    if (_.isEmpty(product)) return res.send('no product found');
+    return res.send(product[0].vendorProducts[0]);
+  } catch (err) {
+    throw err;
+  }
+});
+
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const idValidationSchema = Joi.objectId().required();
+    const idValidationResult = Joi.validate(id, idValidationSchema);
+    if (idValidationResult.error) return res.status(400).send('ProductList ID is not Valid! ');
     const product = await Products.findById(id);
     if (_.isEmpty(product)) return ('no product found');
     return res.send(product);
@@ -90,6 +105,8 @@ router.get('/:id', async (req, res) => {
     throw err;
   }
 });
+
+
 
 router.post('/', auth, async (req, res) => {
   try {
