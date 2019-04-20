@@ -18,38 +18,44 @@ const schema = Joi.object().keys({
     role: Joi.string().required(),
   }),
   logoutToken: Joi.string(),
+  isCustomer: Joi.boolean(),
+  isVendor: Joi.boolean(),
 
 });
 
-// const createUser = async (user) => {
-//   try {
-//     const { email, password, permission } = user;
-//     const result = Joi.validate(user, schema);
-//     if (result.error) {
-//       return ({
-//         err: true,
-//         data: result.error.details[0].message,
-//       });
-//     }
-//     const newUser = await Users.create({
-//       email,
-//       password,
-//       permission,
-//     });
+const createUser = async (user) => {
+  try {
+    const { email, password, permission, isVendor, isCustomer } = user;
+    const result = Joi.validate(user, schema);
+    if (result.error) {
+      return ({
+        err: true,
+        data: result.error.details[0].message,
+      });
+    }
+    const salt = await bcrypt.genSalt(10);
+    const encrypted = await bcrypt.hash(password, salt);
+    const newUser = await Users.create({
+      email,
+      password: encrypted,
+      permission,
+      isVendor,
+      isCustomer,
+    });
 
-//     return ({
-//       err: false,
-//       data: newUser,
-//       _id:newUser._id,
-//     });
-//   } catch (err) {
-//     throw err;
-//   }
-// };
+    return ({
+      err: false,
+      data: newUser,
+      id: newUser.id,
+    });
+  } catch (err) {
+    throw err;
+  }
+};
 
 router.get('/me', auth, async (req, res) => {
   try {
-    const user = await Users.findById(req.user._id).select('-password');
+    const user = await Users.findById(req.user.id).select('-password');
     return res.send(user);
   } catch (err) {
     throw err;
@@ -131,6 +137,7 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
+<<<<<<< HEAD
     let user = await Users.findOne({ email: req.body.email });
     user = await Users.findOne({ id: req.body.id });
     if (user) return res.status(400).send('User already registered');
@@ -165,11 +172,30 @@ router.post('/', async (req, res) => {
     });
     return (newUser.err) ? res.status(400).send(newUser.data)
       : res.header('x-auth-token', token).send(newUser);
+=======
+    const user = await Users.findOne({ email: req.body.email });
+    if (user) return res.status(400).send('User already registered');
+
+    const result = await createUser(req.body);
+    const newUser = result.data;
+    // let token = newUser.generateAuthToken();
+    // token = await bcrypt.hash(token, salt);
+    // newUser = await Users.findByIdAndUpdate(newUser.id, {
+    //   logoutToken: token,
+    // });
+
+    return (newUser.err)
+      ? res.status(400).send(newUser.data)
+      : res.send(newUser);
+>>>>>>> bf5f00cb9d0aa185037a307d062fc3d338f220ea
   } catch (err) {
     throw err;
   }
 });
+<<<<<<< HEAD
 
+=======
+>>>>>>> bf5f00cb9d0aa185037a307d062fc3d338f220ea
 router.put('/:id', async (req, res) => {
   try {
     const { email, password, permission } = req.body;
@@ -203,4 +229,9 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 module.exports = { router };
+=======
+
+module.exports = { router, createUser };
+>>>>>>> bf5f00cb9d0aa185037a307d062fc3d338f220ea
