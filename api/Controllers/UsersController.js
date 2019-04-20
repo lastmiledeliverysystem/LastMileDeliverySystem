@@ -132,7 +132,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     let user = await Users.findOne({ email: req.body.email });
-    user = await Users.findOne({ id: req.body.id })
+    user = await Users.findOne({ id: req.body.id });
     if (user) return res.status(400).send('User already registered');
 
     const salt = await bcrypt.genSalt(10);
@@ -163,16 +163,12 @@ router.post('/', async (req, res) => {
     newUser = await Users.findByIdAndUpdate(newUser.id, {
       logoutToken: token,
     });
-    
-
     return (newUser.err) ? res.status(400).send(newUser.data)
       : res.header('x-auth-token', token).send(newUser);
   } catch (err) {
     throw err;
   }
 });
-
-
 
 router.put('/:id', async (req, res) => {
   try {
@@ -206,6 +202,5 @@ router.delete('/:id', async (req, res) => {
     throw err;
   }
 });
-
 
 module.exports = { router };
