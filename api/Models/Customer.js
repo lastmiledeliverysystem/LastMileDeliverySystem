@@ -15,6 +15,10 @@ const customer = new mongoose.Schema({
     zip: { type: String, required: true },
   },
   ],
+  cart: [
+
+    { type: mongoose.Schema.Types.ObjectId, refPath: 'Products' },
+  ],
 });
 const Customer = mongoose.model('Customer', customer);
 

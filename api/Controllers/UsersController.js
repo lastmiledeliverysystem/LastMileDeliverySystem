@@ -40,12 +40,50 @@ const createUser = async (user) => {
     return ({
       err: false,
       data: newUser,
-      _id:newUser._id,
+      _id: newUser._id,
     });
   } catch (err) {
     throw err;
   }
 };
+
+// all options
+router.get('/test', async (req, res) => {
+  try {
+    const str = req.query;
+    const queryStr = Object.keys(str);
+    // console.log(queryStr);
+    const sortObj = {};
+    const filterObj = {};
+    let skipObj = {};
+    let limitObj = {};
+    let user = NaN;
+
+    if (queryStr.includes('sortBy')) {
+      const { sortBy } = req.query;
+      sortObj[sortBy] = 1;
+    }
+    if (queryStr.includes('pageNumber')) {
+      // const pageSize = 2;
+      let { pageNumber, pageSize } = req.query;
+      pageNumber = parseInt(pageNumber);
+      pageSize = parseInt(pageSize);
+      skipObj = (pageNumber - 1) * pageSize;
+      limitObj = pageSize;
+    }
+    if (queryStr.includes('filterBy')) {
+      const { filterBy } = req.query;
+      filterObj[filterBy] = 1;
+    }
+
+    user = await Users.find({}).sort(sortObj).select(filterObj).skip(skipObj).limit(limitObj);
+    if (_.isEmpty(user)) return res.send('No users');
+    return res.send(user);
+  } catch (err) {
+    throw err;
+  }
+});
+
 
 router.get('/me', auth, async (req, res) => {
   try {
@@ -132,7 +170,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     let user = await Users.findOne({ email: req.body.email });
-    user = await Users.findOne({ id: req.body.id })
+    user = await Users.findOne({ id: req.body.id });
     if (user) return res.status(400).send('User already registered');
 
     const salt = await bcrypt.genSalt(10);
@@ -160,13 +198,13 @@ router.post('/', async (req, res) => {
     const result = await createUser(req.body);
     const newUser = result.data;
     console.log(newUser);
-    
+
     let token = newUser.generateAuthToken();
     token = await bcrypt.hash(token, salt);
     newUser = await Users.findByIdAndUpdate(newUser.id, {
       logoutToken: token,
     });
-    
+
 
     return (newUser.err) ? res.status(400).send(newUser.data)
       : res.header('x-auth-token', token).send(newUser);
@@ -174,7 +212,6 @@ router.post('/', async (req, res) => {
     throw err;
   }
 });
-
 
 
 router.put('/:id', async (req, res) => {

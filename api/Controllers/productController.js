@@ -41,6 +41,42 @@ router.get('/', async (req, res) => {
     throw err;
   }
 });
+// all options
+router.get('/test', async (req, res) => {
+  try {
+    const str = req.query;
+    const queryStr = Object.keys(str);
+    // console.log(queryStr);
+    const sortObj = {};
+    const filterObj = {};
+    let skipObj = {};
+    let limitObj = {};
+    let product = NaN;
+
+    if (queryStr.includes('sortBy')) {
+      const { sortBy } = req.query;
+      sortObj[sortBy] = 1;
+    }
+    if (queryStr.includes('pageNumber')) {
+      // const pageSize = 2;
+      let { pageNumber, pageSize } = req.query;
+      pageNumber = parseInt(pageNumber);
+      pageSize = parseInt(pageSize);
+      skipObj = (pageNumber - 1) * pageSize;
+      limitObj = pageSize;
+    }
+    if (queryStr.includes('filterBy')) {
+      const { filterBy } = req.query;
+      filterObj[filterBy] = 1;
+    }
+
+    product = await Products.find({}).sort(sortObj).select(filterObj).skip(skipObj).limit(limitObj);
+    if (_.isEmpty(product)) return res.send('No products');
+    return res.send(product);
+  } catch (err) {
+    throw err;
+  }
+});
 // Pagination
 router.get('/paging', async (req, res) => {
   try {

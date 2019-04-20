@@ -24,6 +24,7 @@ const customerSchema = Joi.object().keys({
   birthDate: Joi.date().required(),
   imageURL: Joi.string(),
   address: adressSchema,
+  cart: Joi.objectId(),
 });
 // GET all customers
 router.get('/', async (req, res) => {
@@ -35,6 +36,7 @@ router.get('/', async (req, res) => {
     throw err;
   }
 });
+
 // Pagination
 router.get('/paging', async (req, res) => {
   try {
