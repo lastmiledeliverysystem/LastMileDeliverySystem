@@ -53,10 +53,16 @@ router.get('/paging', async (req, res) => {
   }
 });
 
+
+
 // Sorting
 router.get('/sort', async (req, res) => {
   try {
-    const product = await Products.find({}).sort({ name: 1 });
+    const sortObj = {};
+    const { sortBy } = req.query;
+    sortObj[sortBy] = 1;
+
+    const product = await Products.find({}).sort({ sortObj });
     if (_.isEmpty(product)) return res.send('No products');
     return res.send(product);
   } catch (err) {

@@ -47,8 +47,10 @@ const schema = Joi.object().keys({
 
 const createOrder = async (order) => {
   try {
-    const { date, status, items, discountAmount, discount, shippingCharge, total, notes, address,
-      shippmentDate, deliveryDate, trackingPassword, paymentMethod } = order;
+    const {
+      date, status, items, discountAmount, discount, shippingCharge, total, notes, address,
+      shippmentDate, deliveryDate, trackingPassword, paymentMethod,
+    } = order;
     const result = Joi.validate(order, schema);
     if (result.error) {
       return ({
@@ -108,11 +110,10 @@ router.get('/paging', async (req, res) => {
 // Sorting
 router.get('/sort', async (req, res) => {
   try {
-    // console.log ( typeof (req.query.total));
+    const sortObject = {};
     const { sortBy } = req.query;
-    console.log(sortBy);
-    const q = {sortBy:1};
-    const orders = await Orders.find().sort(q);
+    sortObject[sortBy] = 1;
+    const orders = await Orders.find().sort(sortObject);
     if (_.isEmpty(orders)) return res.send('No orders');
     return res.send(orders);
   } catch (err) {
@@ -156,9 +157,13 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   try {
-    const { status, items, address, deliveryDate } = req.body;
+    const {
+      status, items, address, deliveryDate,
+    } = req.body;
     const { id } = req.params;
-    const order = { status, items, address, deliveryDate };
+    const order = {
+      status, items, address, deliveryDate,
+    };
     // Validate ID
     const idValidationSchema = Joi.objectId().required();
     const idValidationResult = Joi.validate(id, idValidationSchema);
@@ -186,7 +191,8 @@ router.delete('/:id', async (req, res) => {
     throw err;
   }
 });
-//delet item
+
+// delet item
 router.delete('/item/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -200,7 +206,4 @@ router.delete('/item/:id', async (req, res) => {
     throw err;
   }
 });
-
-
-
 module.exports = router;
