@@ -3,7 +3,8 @@ const _ = require('lodash');
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 const Customer = require('../Models/Customer');
-const { creatUser } = require('../Controllers/UsersController');
+const { createUser } = require('../Controllers/UsersController');
+const Cart = require('../Models/Cart');
 
 const router = express.Router();
 
@@ -99,17 +100,28 @@ router.post('/', async (req, res) => {
       imageURL,
       address,
     } = req.body;
-    const customer = { fName, lName, phone, birthDate, imageURL, address };
+    const customer = {
+      fName, lName, phone, birthDate, imageURL, address,
+    };
     const customerValidationResult = Joi.validate(customer, customerSchema);
-    if (customerValidationResult.error) {return res
-      .status(400)
-      .send(customerValidationResult.error.details[0].message);}
+    if (customerValidationResult.error) {
+      return res
+        .status(400)
+        .send(customerValidationResult.error.details[0].message);
+    }
     const newCustomer = await Customer.create(customer);
-    const newUser = await creatUser({
+    const newUser = await createUser({
       email,
       password,
-      permission: { id: newCustomer.id, role: 'customer' }
+      permission: { id: newCustomer.id, role: 'customer' },
+      isCustomer: true,
+      isVendor: false,
     });
+    const newCart = {
+      customerId: newCustomer.id,
+      cartItems: [],
+    };
+    await Cart.create(newCart);
     return newUser.err
       ? res.status(400).send(newUser.data)
       : res.send(newUser.data);

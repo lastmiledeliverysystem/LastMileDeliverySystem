@@ -6,9 +6,7 @@ const Products = require('../Models/Products');
 
 const router = express.Router();
 const auth = require('../../middleware/auth');
-const admin = require('../../middleware/admin');
-
-
+const isVendor = require('../../middleware/isVendor');
 
 const productSchema = Joi.object().keys({
   vendorProducts: Joi.array().items(Joi.object().keys({
@@ -91,10 +89,16 @@ router.get('/paging', async (req, res) => {
   }
 });
 
+
+
 // Sorting
 router.get('/sort', async (req, res) => {
   try {
-    const product = await Products.find({}).sort({ name: 1 });
+    const sortObj = {};
+    const { sortBy } = req.query;
+    sortObj[sortBy] = 1;
+
+    const product = await Products.find({}).sort({ sortObj });
     if (_.isEmpty(product)) return res.send('No products');
     return res.send(product);
   } catch (err) {
@@ -113,12 +117,27 @@ router.get('/filter', async (req, res) => {
     throw err;
   }
 });
-router.get('/:id', async (req, res) => {
+
+router.get('/product/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const idValidationSchema = Joi.objectId().required();
     const idValidationResult = Joi.validate(id, idValidationSchema);
     if (idValidationResult.error) return res.status(400).send('Product ID is not Valid! ');
+    const product = await Products.find({'vendorProducts._id':id},{'vendorProducts.$': 1});
+    if (_.isEmpty(product)) return res.send('no product found');
+    return res.send(product[0].vendorProducts[0]);
+  } catch (err) {
+    throw err;
+  }
+});
+
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const idValidationSchema = Joi.objectId().required();
+    const idValidationResult = Joi.validate(id, idValidationSchema);
+    if (idValidationResult.error) return res.status(400).send('ProductList ID is not Valid! ');
     const product = await Products.findById(id);
     if (_.isEmpty(product)) return ('no product found');
     return res.send(product);
@@ -127,7 +146,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', auth, async (req, res) => {
+router.post('/', [auth, isVendor], async (req, res) => {
   try {
     const { vendorProducts } = req.body;
     const productValidationResult = Joi.validate({ vendorProducts }, productSchema);
@@ -135,14 +154,13 @@ router.post('/', auth, async (req, res) => {
     const product = await Products.create({
       vendorProducts,
     });
-
     return res.send(product);
   } catch (err) {
     throw err;
   }
 });
 
-router.delete('/:id', [auth, admin], async (req, res) => {
+router.delete('/:id', [auth, isVendor], async (req, res) => {
   try {
     const { id } = req.params;
     const idValidationSchema = Joi.objectId().required();

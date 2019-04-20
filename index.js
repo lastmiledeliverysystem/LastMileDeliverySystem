@@ -7,6 +7,7 @@ const customerController = require('./api/Controllers/CustomerController');
 const orderController = require('./api/Controllers/OrderController');
 const paymentCardsController = require('./api/Controllers/PaymentCardsController');
 const productController = require('./api/Controllers/productController');
+const cartController = require('./api/Controllers/CartController');
 const auth = require('./api/Controllers/auth');
 
 if (!config.get('jwtPrivateKey')) {
@@ -15,7 +16,7 @@ if (!config.get('jwtPrivateKey')) {
 }
 const app = express();
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
@@ -28,6 +29,7 @@ app.use('/api/customers', customerController);
 app.use('/api/orders', orderController);
 app.use('/api/paymentCards', paymentCardsController);
 app.use('/api/products', productController);
+app.use('/api/cart', cartController);
 app.use('/api/auth', auth);
 
 // const uri = 'mongodb+srv://kay:project#1@cluster0.mongodb.net/admin';
