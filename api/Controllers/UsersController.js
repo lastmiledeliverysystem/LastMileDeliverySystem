@@ -175,17 +175,11 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-<<<<<<< HEAD
-    let user = await Users.findOne({ email: req.body.email });
-    user = await Users.findOne({ id: req.body.id });
-=======
     const user = await Users.findOne({ email: req.body.email });
->>>>>>> a5e3569bf7a5794137dde94ffc2276529e9c87b5
     if (user) return res.status(400).send('User already registered');
 
     const result = await createUser(req.body);
     const newUser = result.data;
-<<<<<<< HEAD
     console.log(newUser);
 
     let token = newUser.generateAuthToken();
@@ -194,13 +188,11 @@ router.post('/', async (req, res) => {
       logoutToken: token,
     });
 
-=======
     // let token = newUser.generateAuthToken();
     // token = await bcrypt.hash(token, salt);
     // newUser = await Users.findByIdAndUpdate(newUser.id, {
     //   logoutToken: token,
     // });
->>>>>>> a5e3569bf7a5794137dde94ffc2276529e9c87b5
 
     return (newUser.err)
       ? res.status(400).send(newUser.data)
@@ -209,11 +201,8 @@ router.post('/', async (req, res) => {
     throw err;
   }
 });
-<<<<<<< HEAD
 
 
-=======
->>>>>>> a5e3569bf7a5794137dde94ffc2276529e9c87b5
 router.put('/:id', async (req, res) => {
   try {
     const { email, password, permission } = req.body;

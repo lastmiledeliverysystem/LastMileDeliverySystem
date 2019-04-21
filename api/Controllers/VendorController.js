@@ -44,6 +44,42 @@ router.get('/', async (req, res) => {
     throw err;
   }
 });
+// all options
+router.get('/test', async (req, res) => {
+  try {
+    const str = req.query;
+    const queryStr = Object.keys(str);
+    // console.log(queryStr);
+    const sortObj = {};
+    const filterObj = {};
+    const pageSize = 1;
+    let skipObj = {};
+    let limitObj = {};
+    let product = NaN;
+
+    if (queryStr.includes('sortBy')) {
+      const { sortBy } = req.query;
+      sortObj[sortBy] = 1;
+    }
+    if (queryStr.includes('pageNumber')) {
+      let { pageNumber } = req.query;
+      pageNumber = parseInt(pageNumber);
+      // pageSize = parseInt(pageSize);
+      skipObj = (pageNumber - 1) * pageSize;
+      limitObj = pageSize;
+    }
+    if (queryStr.includes('filterBy')) {
+      const { filterBy } = req.query;
+      filterObj[filterBy] = 1;
+    }
+    const pageCount = await Vendor.estimatedDocumentCount()/pageSize;
+    vendor = await Vendor.find({}).sort(sortObj).select(filterObj).skip(skipObj).limit(limitObj);
+    if (_.isEmpty(vendor)) return res.send('No Vendors');
+    return res.send({vendor, pageCount});
+  } catch (err) {
+    throw err;
+  }
+});
 // Pagination
 router.get('/paging', async (req, res) => {
   try {

@@ -40,7 +40,7 @@ router.get('/', async (req, res) => {
   }
 });
 // all options
-router.get('/test', async (req, res) => {
+router.get('/:id/test', async (req, res) => {
   try {
     const str = req.query;
     const queryStr = Object.keys(str);
@@ -68,7 +68,8 @@ router.get('/test', async (req, res) => {
       filterObj[filterBy] = 1;
     }
 
-    product = await Products.find({}).sort(sortObj).select(filterObj).skip(skipObj).limit(limitObj);
+    product = await Products.findById(req.params.id);
+    console.log(product.vendorProducts.skip(skipObj).limit(limitObj));
     if (_.isEmpty(product)) return res.send('No products');
     return res.send(product);
   } catch (err) {
