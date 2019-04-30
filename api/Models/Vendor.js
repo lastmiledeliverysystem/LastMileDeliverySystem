@@ -2,7 +2,6 @@
 const mongoose = require('mongoose');
 
 const vendor = new mongoose.Schema({
-  vendorId: mongoose.Schema.Types.ObjectId,
   name: {
     type: String,
     required: true,
@@ -33,9 +32,7 @@ const vendor = new mongoose.Schema({
       type: String, required: true,
     },
   },
-  vendorProducts: {
-    type: mongoose.Schema.Types.ObjectId, required: true,
-  },
+
 
 });
 const Vendor = mongoose.model('Vendor', vendor);

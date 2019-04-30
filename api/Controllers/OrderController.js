@@ -31,12 +31,9 @@ const schema = Joi.object().keys({
   shippingCharge: Joi.number(),
   total: Joi.number().required(),
   notes: Joi.string(),
-  address: Joi.object().keys({
-    address1: Joi.string().required(),
-    address2: Joi.string().required(),
-    state: Joi.string().required(),
-    city: Joi.string().required(),
-    zip: Joi.string().required(),
+  location: Joi.object().keys({
+    lat: Joi.number().required(),
+    long: Joi.number().required(),
   }),
   shippmentDate: Joi.date().format('DD-MM-YYYY'),
   trackingPassword: Joi.string().regex(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/).required(),
@@ -48,7 +45,7 @@ const schema = Joi.object().keys({
 const createOrder = async (order) => {
   try {
     const {
-      date, status, items, discountAmount, discount, shippingCharge, total, notes, address,
+      date, status, items, discountAmount, discount, shippingCharge, total, notes, location,
       shippmentDate, deliveryDate, trackingPassword, paymentMethod,
     } = order;
     const result = Joi.validate(order, schema);
@@ -67,7 +64,7 @@ const createOrder = async (order) => {
       shippingCharge,
       total,
       notes,
-      address,
+      location,
       shippmentDate,
       deliveryDate,
       trackingPassword,

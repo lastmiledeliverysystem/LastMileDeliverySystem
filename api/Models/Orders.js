@@ -35,28 +35,10 @@ const orders = new mongoose.Schema({
   shippingCharge: Number,
   total: Number,
   notes: String,
-  address: [{
-    address1: {
-      type: String,
-      required: true,
-    },
-    address2: {
-      type: String,
-      required: true,
-    },
-    state: {
-      type: String,
-      required: true,
-    },
-    city: {
-      type: String,
-      required: true,
-    },
-    zip: {
-      type: String,
-      required: true,
-    },
-  }],
+  location:{
+    lat: Number,
+    long: Number,
+  },
   shippmentDate: {
     type: Date,
     required: false,

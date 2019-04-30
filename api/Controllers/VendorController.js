@@ -3,7 +3,6 @@ const _ = require('lodash');
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 const Vendor = require('../Models/Vendor');
-const Products = require('../Models/Products');
 const { createUser } = require('../Controllers/UsersController');
 
 const router = express.Router();
@@ -44,17 +43,19 @@ router.get('/', async (req, res) => {
     throw err;
   }
 });
+
 // all options
-router.get('/test', async (req, res) => {
+router.get('/search', async (req, res) => {
   try {
     const str = req.query;
     const queryStr = Object.keys(str);
     // console.log(queryStr);
     const sortObj = {};
     const filterObj = {};
+    const selectObj = {};
     const pageSize = 1;
-    let skipObj = {};
-    let limitObj = {};
+    let skipObj = 1;
+    let limitObj = 1;
     let product = NaN;
 
     if (queryStr.includes('sortBy')) {
@@ -68,12 +69,16 @@ router.get('/test', async (req, res) => {
       skipObj = (pageNumber - 1) * pageSize;
       limitObj = pageSize;
     }
+    if (queryStr.includes('selectBy')) {
+      const { selectBy } = req.query;
+      selectObj[selectBy] = 1;
+    }
     if (queryStr.includes('filterBy')) {
-      const { filterBy } = req.query;
-      filterObj[filterBy] = 1;
+      const { filterBy, value } = req.query;
+      filterObj[filterBy] = value;
     }
     const pageCount = await Vendor.estimatedDocumentCount()/pageSize;
-    vendor = await Vendor.find({}).sort(sortObj).select(filterObj).skip(skipObj).limit(limitObj);
+    vendor = await Vendor.find(filterObj).sort(sortObj).select(selectObj).skip(skipObj).limit(limitObj);
     if (_.isEmpty(vendor)) return res.send('No Vendors');
     return res.send({vendor, pageCount});
   } catch (err) {
@@ -141,7 +146,7 @@ router.post('/', async (req, res) => {
       imageURL,
       address,
     } = req.body;
-    const vendorProducts = await Products.create({vendorProducts:[]})
+    // const vendorProducts = await Products.create({vendorProducts:[]})
     const result = Joi.validate(req.body, vendorSchema);
     if (result.error) return res.status(400).send(result.error.details[0].message);
 
@@ -154,7 +159,6 @@ router.post('/', async (req, res) => {
       vendorType,
       imageURL,
       address,
-      vendorProducts: vendorProducts.id
     });
     const user = {
       email,
@@ -186,7 +190,6 @@ router.put('/:id', async (req, res) => {
       vendorType,
       imageURL,
       address,
-      vendorProduct,
     } = req.body;
     // validating ID
     const idValidationResult = Joi.validate(id, idValidationSchema);
@@ -201,7 +204,6 @@ router.put('/:id', async (req, res) => {
       vendorType,
       imageURL,
       address,
-      vendorProduct,
     };
     const user = {
       email,
