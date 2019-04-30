@@ -39,15 +39,17 @@ router.get('/', async (req, res) => {
   }
 });
 // all options
-router.get('/:id/test', async (req, res) => {
+router.get('/search', async (req, res) => {
   try {
     const str = req.query;
     const queryStr = Object.keys(str);
     // console.log(queryStr);
     const sortObj = {};
     const filterObj = {};
-    let skipObj = {};
-    let limitObj = {};
+    const selectObj = {};
+    const pageSize = 1;
+    let skipObj = 1;
+    let limitObj = 1;
     let product = NaN;
 
     if (queryStr.includes('sortBy')) {
@@ -55,22 +57,26 @@ router.get('/:id/test', async (req, res) => {
       sortObj[sortBy] = 1;
     }
     if (queryStr.includes('pageNumber')) {
-      // const pageSize = 2;
-      let { pageNumber, pageSize } = req.query;
+      let { pageNumber } = req.query;
       pageNumber = parseInt(pageNumber);
-      pageSize = parseInt(pageSize);
+      // pageSize = parseInt(pageSize);
       skipObj = (pageNumber - 1) * pageSize;
       limitObj = pageSize;
     }
+    if (queryStr.includes('selectBy')) {
+      const { selectBy } = req.query;
+      selectObj[selectBy] = 1;
+    }
     if (queryStr.includes('filterBy')) {
-      const { filterBy } = req.query;
-      filterObj[filterBy] = 1;
+      const { filterBy, value } = req.query;
+      filterObj[filterBy] = value;
     }
 
-    product = await Products.findById(req.params.id);
-    console.log(product.vendorProducts.skip(skipObj).limit(limitObj));
+    const pageCount = await Products.count(filterObj) / pageSize;
+    product = await Products.find(filterObj).sort(sortObj).select(selectObj).skip(skipObj).limit(limitObj);
+
     if (_.isEmpty(product)) return res.send('No products');
-    return res.send(product);
+    return res.send({ product, pageCount });
   } catch (err) {
     throw err;
   }
@@ -124,7 +130,7 @@ router.get('/:id', async (req, res) => {
     const idValidationSchema = Joi.objectId().required();
     const idValidationResult = Joi.validate(id, idValidationSchema);
     if (idValidationResult.error) return res.status(400).send('ProductList ID is not Valid! ');
-    const product = await Products.findById(id);
+    const product = await Products.find({ vendorId: id });
     if (_.isEmpty(product)) return ('no product found');
     return res.send(product);
   } catch (err) {

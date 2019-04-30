@@ -77,8 +77,9 @@ router.get('/search', async (req, res) => {
       const { filterBy, value } = req.query;
       filterObj[filterBy] = value;
     }
-    const pageCount = await Vendor.estimatedDocumentCount()/pageSize;
+    const pageCount = await Vendor.count(filterObj)/pageSize;
     vendor = await Vendor.find(filterObj).sort(sortObj).select(selectObj).skip(skipObj).limit(limitObj);
+    // const pageCount = vendor.length/pageSize;
     if (_.isEmpty(vendor)) return res.send('No Vendors');
     return res.send({vendor, pageCount});
   } catch (err) {
