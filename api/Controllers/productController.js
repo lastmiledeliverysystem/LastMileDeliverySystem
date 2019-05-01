@@ -47,7 +47,7 @@ router.get('/search', async (req, res) => {
     const sortObj = {};
     const filterObj = {};
     const selectObj = {};
-    const pageSize = 1;
+    //const pageSize = 1;
     let skipObj = 1;
     let limitObj = 1;
     let product = NaN;
@@ -57,9 +57,9 @@ router.get('/search', async (req, res) => {
       sortObj[sortBy] = 1;
     }
     if (queryStr.includes('pageNumber')) {
-      let { pageNumber } = req.query;
+      let { pageNumber, pageSize } = req.query;
       pageNumber = parseInt(pageNumber);
-      // pageSize = parseInt(pageSize);
+      pageSize = parseInt(pageSize);
       skipObj = (pageNumber - 1) * pageSize;
       limitObj = pageSize;
     }
@@ -71,54 +71,11 @@ router.get('/search', async (req, res) => {
       const { filterBy, value } = req.query;
       filterObj[filterBy] = value;
     }
-
-    const pageCount = await Products.count(filterObj) / pageSize;
-    product = await Products.find(filterObj).sort(sortObj).select(selectObj).skip(skipObj).limit(limitObj);
-
+    const pageCount = await Products.count(filterObj) / parseInt(req.query.pageSize);
+    product = await Products.find(filterObj).sort(sortObj).select(selectObj).skip(skipObj).limit(limitObj);    
     if (_.isEmpty(product)) return res.send('No products');
     return res.send({ product, pageCount });
-  } catch (err) {
-    throw err;
-  }
-});
-// Pagination
-router.get('/paging', async (req, res) => {
-  try {
-    let { pageNumber, pageSize } = req.query;
-    pageNumber = parseInt(pageNumber);
-    pageSize = parseInt(pageSize);
-    const product = await Products.find({}).skip((pageNumber - 1) * pageSize).limit(pageSize);
-    if (_.isEmpty(product)) return res.send('No products');
-    return res.send(product);
-  } catch (err) {
-    throw err;
-  }
-});
-
-
-
-// Sorting
-router.get('/sort', async (req, res) => {
-  try {
-    const sortObj = {};
-    const { sortBy } = req.query;
-    sortObj[sortBy] = 1;
-
-    const product = await Products.find({}).sort({ sortObj });
-    if (_.isEmpty(product)) return res.send('No products');
-    return res.send(product);
-  } catch (err) {
-    throw err;
-  }
-});
-
-// Filtering
-router.get('/filter', async (req, res) => {
-  try {
-    const product = await Products.find({})
-      .select({ name: 1 });
-    if (_.isEmpty(product)) return res.send('No products');
-    return res.send(product);
+    
   } catch (err) {
     throw err;
   }
