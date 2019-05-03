@@ -67,7 +67,7 @@ router.get('/search', async (req, res) => {
       pageNumber = parseInt(pageNumber);
       // pageSize = parseInt(pageSize);
       skipObj = (pageNumber - 1) * pageSize;
-      limitObj = pageSize;
+      limitObj = parseInt(pageSize);
     }
     if (queryStr.includes('selectBy')) {
       const { selectBy } = req.query;

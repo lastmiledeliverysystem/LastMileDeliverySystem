@@ -95,6 +95,20 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+router.get('/product/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const idValidationSchema = Joi.objectId().required();
+    const idValidationResult = Joi.validate(id, idValidationSchema);
+    if (idValidationResult.error) return res.status(400).send('ProductList ID is not Valid! ');
+    const product = await Products.find({ _id: id });
+    if (_.isEmpty(product)) return ('no product found');
+    return res.send(product);
+  } catch (err) {
+    throw err;
+  }
+});
+
 
 // router.post('/', [auth, isVendor], async (req, res) => {
 router.post('/', async (req, res) => {
