@@ -35,7 +35,7 @@ router.get('/', async (req, res) => {
     if (_.isEmpty(product)) return ('no product found');
     return res.send(product);
   } catch (err) {
-    throw err;
+    res.send(err)
   }
 });
 // all options
@@ -77,7 +77,24 @@ router.get('/search', async (req, res) => {
     return res.send({ product, pageCount });
     
   } catch (err) {
-    throw err;
+    res.send(err)
+  }
+});
+
+router.post('/list', async (req, res) => {
+  try {
+    const { ids } = req.body;
+    console.log(ids);
+    // const idValidationSchema = Joi.objectId().required();
+    // const idValidationResult = Joi.validate(id, idValidationSchema);
+    // if (idValidationResult.error) return res.status(400).send('ProductList ID is not Valid! ');
+    // const productsList = [];
+    
+    let product = await Products.find({'_id': { $in: ids}});
+    if (_.isEmpty(product)) return ('no product found');
+    return res.send(product);
+  } catch (err) {
+    res.send(err)
   }
 });
 
@@ -91,7 +108,7 @@ router.get('/:id', async (req, res) => {
     if (_.isEmpty(product)) return ('no product found');
     return res.send(product);
   } catch (err) {
-    throw err;
+    res.send(err)
   }
 });
 
@@ -105,9 +122,11 @@ router.get('/product/:id', async (req, res) => {
     if (_.isEmpty(product)) return ('no product found');
     return res.send(product);
   } catch (err) {
-    throw err;
+    res.send(err)
   }
 });
+
+
 
 
 // router.post('/', [auth, isVendor], async (req, res) => {
@@ -120,7 +139,7 @@ try {
     const newProduct = await Products.create(product);
     return res.send(newProduct);
   } catch (err) {
-    throw err;
+    res.send(err)
   }
 });
 
@@ -133,7 +152,7 @@ router.delete('/:id', [auth, isVendor], async (req, res) => {
     const product = await Products.findByIdAndDelete(id);
     return res.send(product);
   } catch (err) {
-    throw err;
+    res.send(err)
   }
 });
 module.exports = router;
