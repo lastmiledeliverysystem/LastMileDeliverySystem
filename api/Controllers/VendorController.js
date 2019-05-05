@@ -53,10 +53,10 @@ router.get('/search', async (req, res) => {
     const sortObj = {};
     const filterObj = {};
     const selectObj = {};
-    //const pageSize = 1;
+    // const pageSize = 1;
     let skipObj = 1;
     let limitObj = 1;
-    let product = NaN;
+    const product = NaN;
 
     if (queryStr.includes('sortBy')) {
       const { sortBy } = req.query;
@@ -75,13 +75,21 @@ router.get('/search', async (req, res) => {
     }
     if (queryStr.includes('filterBy')) {
       const { filterBy, value } = req.query;
-      filterObj[filterBy] = value;
+      if (_.isArray(filterBy)) {
+        for (let index = 0; index < filterBy.length; index++) {
+          filterObj[filterBy[index]] = value[index];
+        }
+      } else {
+        filterObj[filterBy] = value;
+      }
+      console.log(filterObj);
     }
     const pageCount = await Vendor.count(filterObj) / parseInt(req.query.pageSize);
-    vendor = await Vendor.find(filterObj).sort(sortObj).select(selectObj).skip(skipObj).limit(limitObj);
+    vendor = await Vendor.find(filterObj).sort(sortObj).select(selectObj).skip(skipObj)
+.limit(limitObj);
     // const pageCount = vendor.length/pageSize;
     if (_.isEmpty(vendor)) return res.send('No Vendors');
-    return res.send({vendor, pageCount});
+    return res.send({ vendor, pageCount });
   } catch (err) {
     throw err;
   }
@@ -139,7 +147,7 @@ router.post('/', async (req, res) => {
     return newUser.err ? res.status(400).send(newUser.data) : res.send(vendor);
   } catch (err) {
     throw err;
-   
+
   }
 });
 

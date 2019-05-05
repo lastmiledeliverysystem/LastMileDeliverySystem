@@ -69,7 +69,14 @@ router.get('/search', async (req, res) => {
     }
     if (queryStr.includes('filterBy')) {
       const { filterBy, value } = req.query;
-      filterObj[filterBy] = value;
+      if (_.isArray(filterBy)) {
+        for (let index = 0; index < filterBy.length; index++) {
+          filterObj[filterBy[index]] = value[index];
+        }
+      } else {
+        filterObj[filterBy] = value;
+      }
+      console.log(filterObj);
     }
     const pageCount = await Products.count(filterObj) / parseInt(req.query.pageSize);
     product = await Products.find(filterObj).sort(sortObj).select(selectObj).skip(skipObj).limit(limitObj);    
