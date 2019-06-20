@@ -8,13 +8,14 @@ const orders = new mongoose.Schema({
     type: String,
     required: true,
   },
+  c
   items: {
     id: mongoose.Schema.Types.ObjectId,
     name: {
       type: String,
       required: true,
     },
-    description: String,
+    comment: String,
     quantity: {
       type: Number,
       required: true,
