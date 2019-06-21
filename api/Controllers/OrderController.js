@@ -7,6 +7,7 @@ const Joi = BaseJoi.extend(Extension);
 Joi.objectId = require('joi-objectid')(Joi);
 
 const Orders = require('../Models/Orders');
+const auth = require('../../middleware/auth');
 
 const router = express.Router();
 
@@ -17,24 +18,19 @@ const schema = Joi.object().keys({
   salesOrderNumber: Joi.objectId(),
   robotId: Joi.objectId(),
   customerId: Joi.objectId(),
+  itemId: Joi.objectId(),
   date: Joi.date().format('DD-MM-YYYY'),
   status: Joi.string().required(),
-  items: Joi.object().keys({
-    name: Joi.string().required(),
-    description: Joi.string(),
-    quantity: Joi.string().required(),
-    unit: Joi.string().required(),
-    imageName: Joi.string().required(),
-  }),
   discountAmount: Joi.number(),
   discount: Joi.number(),
   shippingCharge: Joi.number(),
   total: Joi.number().required(),
   notes: Joi.string(),
-  location: Joi.object().keys({
+  address: Joi.object().keys({
     lat: Joi.number().required(),
-    long: Joi.number().required(),
+    mag: Joi.number().required(),
   }),
+  quantity: Joi.number(),
   shippmentDate: Joi.date().format('DD-MM-YYYY'),
   trackingPassword: Joi.string().regex(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/).required(),
   deliveryDate: Joi.date().format('DD-MM-YYYY'),
@@ -42,11 +38,12 @@ const schema = Joi.object().keys({
 
 });
 
-const createOrder = async (order) => {
+const createOrder = async (order, TokencustomerId) => {
   try {
+    const customerId = TokencustomerId;
     const {
-      date, status, items, discountAmount, discount, shippingCharge, total, notes, location,
-      shippmentDate, deliveryDate, trackingPassword, paymentMethod,
+      date, status, itemId, discountAmount, discount, shippingCharge, total, notes, address,
+      shippmentDate, deliveryDate, trackingPassword, paymentMethod, quantity,
     } = order;
     const result = Joi.validate(order, schema);
     if (result.error) {
@@ -58,17 +55,19 @@ const createOrder = async (order) => {
     const newOrder = await Orders.create({
       date,
       status,
-      items,
+      itemId,
+      quantity,
       discountAmount,
       discount,
       shippingCharge,
       total,
       notes,
-      location,
+      address,
       shippmentDate,
       deliveryDate,
       trackingPassword,
       paymentMethod,
+      customerId,
     });
     return ({
       err: false,
@@ -143,9 +142,11 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
   try {
-    const result = await createOrder(req.body);
+    console.log("Hello");
+    const result = await createOrder(req.body, res.locals.user);
+    console.log(result);
     return (result.err) ? res.status(400).send(result.data) : res.send(result.data);
   } catch (err) {
     throw err;

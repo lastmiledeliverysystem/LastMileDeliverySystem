@@ -8,37 +8,17 @@ const orders = new mongoose.Schema({
     type: String,
     required: true,
   },
-  c
-  items: {
-    id: mongoose.Schema.Types.ObjectId,
-    name: {
-      type: String,
-      required: true,
-    },
-    comment: String,
-    quantity: {
-      type: Number,
-      required: true,
-    },
-    unit: {
-      type: String,
-      required: true,
-    },
-    imageName: {
-      type: String,
-      required: true,
-    },
-  },
-
+  quantity: Number,
+  itemId: mongoose.Schema.Types.ObjectId,
   customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'customers', required: true },
   discountAmount: Number,
   discount: Number,
   shippingCharge: Number,
   total: Number,
   notes: String,
-  location:{
+  address: {
     lat: Number,
-    long: Number,
+    mag: Number,
   },
   shippmentDate: {
     type: Date,
