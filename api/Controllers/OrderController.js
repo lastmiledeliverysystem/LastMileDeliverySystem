@@ -8,6 +8,8 @@ Joi.objectId = require('joi-objectid')(Joi);
 
 const Orders = require('../Models/Orders');
 
+const auth = require('../../middleware/auth');
+
 const router = express.Router();
 
 
@@ -17,37 +19,42 @@ const schema = Joi.object().keys({
   salesOrderNumber: Joi.objectId(),
   robotId: Joi.objectId(),
   customerId: Joi.objectId(),
+  items: Joi.array().items(Joi.object({
+    name:Joi.string(),
+    notes: Joi.string(),
+    address: {
+      lat: Joi.number(),
+      long: Joi.number(),
+},
+  })),
+// items: Joi.,
   date: Joi.date().format('DD-MM-YYYY'),
-  status: Joi.string().required(),
-  items: Joi.object().keys({
-    name: Joi.string().required(),
-    description: Joi.string(),
-    quantity: Joi.string().required(),
-    unit: Joi.string().required(),
-    imageName: Joi.string().required(),
-  }),
+  status: Joi.string(),
   discountAmount: Joi.number(),
   discount: Joi.number(),
   shippingCharge: Joi.number(),
-  total: Joi.number().required(),
+  total: Joi.number(),
   notes: Joi.string(),
-  location: Joi.object().keys({
+  address: Joi.object().keys({
     lat: Joi.number().required(),
     long: Joi.number().required(),
   }),
+  quantity: Joi.number(),
   shippmentDate: Joi.date().format('DD-MM-YYYY'),
-  trackingPassword: Joi.string().regex(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/).required(),
+  trackingPassword: Joi.string().regex(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/),
   deliveryDate: Joi.date().format('DD-MM-YYYY'),
-  paymentMethod: Joi.string().required(),
+  paymentMethod: Joi.string(),
 
 });
 
-const createOrder = async (order) => {
+const createOrder = async (order, TokencustomerId) => {
   try {
+    const customerId = TokencustomerId;
     const {
-      date, status, items, discountAmount, discount, shippingCharge, total, notes, location,
-      shippmentDate, deliveryDate, trackingPassword, paymentMethod,
+      date, status, items, discountAmount, discount, shippingCharge, total, notes, address,
+      shippmentDate, deliveryDate, trackingPassword, paymentMethod, quantity,
     } = order;
+    console.log("order", order);
     const result = Joi.validate(order, schema);
     if (result.error) {
       return ({
@@ -59,16 +66,18 @@ const createOrder = async (order) => {
       date,
       status,
       items,
+      quantity,
       discountAmount,
       discount,
       shippingCharge,
       total,
       notes,
-      location,
+      address,
       shippmentDate,
       deliveryDate,
       trackingPassword,
       paymentMethod,
+      customerId,
     });
     return ({
       err: false,
@@ -143,9 +152,11 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
   try {
-    const result = await createOrder(req.body);
+    const tmp = {name, }
+    const result = await createOrder(req.body, req.user);
+    // console.log("request body", req.body);
     return (result.err) ? res.status(400).send(result.data) : res.send(result.data);
   } catch (err) {
     throw err;

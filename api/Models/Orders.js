@@ -3,61 +3,52 @@ const mongoose = require('mongoose');
 const orders = new mongoose.Schema({
   salesOrderNumber: mongoose.Schema.Types.ObjectId,
   robotId: mongoose.Schema.Types.ObjectId,
-  date: Date,
+  date: {
+    type: Date,
+    default: Date.now,
+  },
   status: {
     type: String,
-    required: true,
+    required: false,
   },
-  c
-  items: {
-    id: mongoose.Schema.Types.ObjectId,
-    name: {
-      type: String,
-      required: true,
-    },
-    comment: String,
-    quantity: {
-      type: Number,
-      required: true,
-    },
-    unit: {
-      type: String,
-      required: true,
-    },
-    imageName: {
-      type: String,
-      required: true,
-    },
-  },
-
-  customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'customers', required: true },
+  quantity: Number,
+  items: [{
+    name: String,
+    notes: String,
+    address: {
+      lat: Number,
+      long: Number,
+},
+  }],
+  // items: String,
+  customerId: { type: mongoose.Schema.Types.ObjectId },
   discountAmount: Number,
   discount: Number,
   shippingCharge: Number,
   total: Number,
   notes: String,
-  location:{
+  address: {
     lat: Number,
     long: Number,
   },
   shippmentDate: {
     type: Date,
-    required: false,
+    default: Date.now,
   },
   deliveryDate: {
     type: Date,
-    required: false,
+    default: Date.now,
   },
   trackingPassword: {
     type: String,
-    required: true,
+    required: false,
     match: /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/,
   },
-  vendorId: { type: mongoose.Schema.Types.ObjectId, ref: 'vendors', required: true },
+  vendorId: { type: mongoose.Schema.Types.ObjectId },
   // paymentId: { type: mongoose.Schema.Types.ObjectId, ref: 'paymentcards', required: true },
   paymentMethod: {
     type: String,
-    required: true,
+    required: false,
   },
 
 });
