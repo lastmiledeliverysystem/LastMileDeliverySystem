@@ -97,7 +97,7 @@ router.post('/list', async (req, res) => {
     // if (idValidationResult.error) return res.status(400).send('ProductList ID is not Valid! ');
     // const productsList = [];
     
-    let product = await Products.find({'_id': { $in: ids}}).select('-options');
+    let product = await Products.find({'_id': { $in: ids}});
     if (_.isEmpty(product)) return ('no product found');
     return res.send(product);
   } catch (err) {

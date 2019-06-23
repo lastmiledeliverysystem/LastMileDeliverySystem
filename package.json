@@ -29,7 +29,7 @@
     "mongoose-paginate": "^5.0.3",
     "mongoose-type-email": "^1.0.10",
     "morgan": "^1.9.1",
-    "nodemon": "^1.18.10",
+    "nodemon": "^1.19.1",
     "url": "^0.11.0",
     "url-parse": "^1.4.4"
   },

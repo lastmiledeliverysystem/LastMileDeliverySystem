@@ -13,12 +13,13 @@ const orders = new mongoose.Schema({
   },
   quantity: Number,
   items: [{
-    name: String,
-    notes: String,
-    address: {
-      lat: Number,
-      long: Number,
-},
+    name:String,
+    category:String,
+    description:String,
+    price:Number,
+    unit:String,
+    vendorId: mongoose.Schema.Types.ObjectId,
+    
   }],
   // items: String,
   customerId: { type: mongoose.Schema.Types.ObjectId },

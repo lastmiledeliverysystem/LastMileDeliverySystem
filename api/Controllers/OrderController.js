@@ -7,7 +7,6 @@ const Joi = BaseJoi.extend(Extension);
 Joi.objectId = require('joi-objectid')(Joi);
 
 const Orders = require('../Models/Orders');
-
 const auth = require('../../middleware/auth');
 
 const router = express.Router();
@@ -21,11 +20,11 @@ const schema = Joi.object().keys({
   customerId: Joi.objectId(),
   items: Joi.array().items(Joi.object({
     name:Joi.string(),
-    notes: Joi.string(),
-    address: {
-      lat: Joi.number(),
-      long: Joi.number(),
-},
+    price:Joi.number(),
+    unit:Joi.string(),
+    vendorId:Joi.objectId(),
+    category:Joi.string(),
+    description:Joi.string()
   })),
 // items: Joi.,
   date: Joi.date().format('DD-MM-YYYY'),
@@ -50,19 +49,15 @@ const schema = Joi.object().keys({
 const createOrder = async (order, TokencustomerId) => {
   try {
     const customerId = TokencustomerId;
+    const oldItems = order.items;
+    const items = oldItems.map(p => ({ name:p.name, category:p.category,price:p.price,unit:p.unit,description:p.description,vendorId:p.vendorId}));
+    
     const {
-      date, status, items, discountAmount, discount, shippingCharge, total, notes, address,
+      date, status, discountAmount, discount, shippingCharge, total, notes, address,
       shippmentDate, deliveryDate, trackingPassword, paymentMethod, quantity,
     } = order;
-    console.log("order", order);
-    const result = Joi.validate(order, schema);
-    if (result.error) {
-      return ({
-        err: true,
-        data: result.error.details[0].message,
-      });
-    }
-    const newOrder = await Orders.create({
+    // console.log("order", order);
+    const filteredOrder = {
       date,
       status,
       items,
@@ -78,7 +73,15 @@ const createOrder = async (order, TokencustomerId) => {
       trackingPassword,
       paymentMethod,
       customerId,
-    });
+    };
+    const result = Joi.validate(filteredOrder, schema);
+    if (result.error) {
+      return ({
+        err: true,
+        data: result.error.details[0].message,
+      });
+    }
+    const newOrder = await Orders.create(filteredOrder);
     return ({
       err: false,
       data: newOrder,
@@ -154,7 +157,6 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', auth, async (req, res) => {
   try {
-    const tmp = {name, }
     const result = await createOrder(req.body, req.user);
     // console.log("request body", req.body);
     return (result.err) ? res.status(400).send(result.data) : res.send(result.data);
