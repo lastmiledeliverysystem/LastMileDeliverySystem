@@ -17,19 +17,19 @@ const vendor = new mongoose.Schema({
   imageURL: String,
   address: {
     address1: {
-      type: String, required: true,
+      type: String, required: false,
     },
     address2: {
-      type: String, required: true,
+      type: String, required: false,
     },
     state: {
-      type: String, required: true,
+      type: String, required: false,
     },
     city: {
-      type: String, required: true,
+      type: String, required: false,
     },
     zip: {
-      type: String, required: true,
+      type: String, required: false,
     },
   },
 

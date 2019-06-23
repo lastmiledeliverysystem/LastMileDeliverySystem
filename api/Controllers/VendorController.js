@@ -11,13 +11,12 @@ const idValidationSchema = Joi.objectId().required();
 
 const adressSchema = Joi.object()
   .keys({
-    address1: Joi.string().required(),
-    address2: Joi.string().required(),
-    state: Joi.string().required(),
-    city: Joi.string().required(),
-    zip: Joi.string().required(),
+    address1: Joi.string(),
+    address2: Joi.string(),
+    state: Joi.string(),
+    city: Joi.string(),
+    zip: Joi.string(),
   })
-  .required();
 
 const vendorSchema = Joi.object().keys({
   email: Joi.string()

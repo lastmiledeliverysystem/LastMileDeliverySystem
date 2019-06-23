@@ -17,8 +17,9 @@
   },
   "homepage": "https://github.com/lastmiledeliverysystem/LastMileDeliverySystem#readme",
   "dependencies": {
+    "axios": "^0.19.0",
     "bcrypt": "^3.0.4",
-    "config": "^3.0.1",
+    "config": "^3.1.0",
     "express": "^4.16.4",
     "joi": "^14.3.1",
     "joi-date-extensions": "^1.2.0",
