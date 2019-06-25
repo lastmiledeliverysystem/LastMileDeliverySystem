@@ -9,7 +9,15 @@ const orders = new mongoose.Schema({
     required: true,
   },
   quantity: Number,
-  itemId: mongoose.Schema.Types.ObjectId,
+  items: [{
+    name: String,
+    category: String,
+    description: String,
+    price: Number,
+    unit: String,
+    vendorId: mongoose.Schema.Types.ObjectId,
+
+  }],
   customerId: mongoose.Schema.Types.ObjectId,
   discountAmount: Number,
   discount: Number,
@@ -43,11 +51,11 @@ const orders = new mongoose.Schema({
 });
 
 
-orders.pre('save', function(next){
+orders.pre('save', function (next) {
   now = new Date();
   this.updated_at = now;
-  if(!this.date) {
-      this.date = now
+  if (!this.date) {
+    this.date = now;
   }
   next();
 });
