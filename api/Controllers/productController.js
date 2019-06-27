@@ -78,7 +78,8 @@ router.get('/search', async (req, res) => {
       }
       console.log(filterObj);
     }
-    const pageCount = await Products.count(filterObj) / parseInt(req.query.pageSize);
+    let pageCount = await Products.count(filterObj) / parseInt(req.query.pageSize);
+    pageCount = Math.floor(pageCount);
     product = await Products.find(filterObj).sort(sortObj).select(selectObj).skip(skipObj).limit(limitObj);    
     if (_.isEmpty(product)) return res.send('No products');
     return res.send({ product, pageCount });

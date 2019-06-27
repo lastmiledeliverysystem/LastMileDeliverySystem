@@ -81,15 +81,17 @@ router.get('/search', async (req, res) => {
       } else {
         filterObj[filterBy] = value;
       }
-      console.log(filterObj);
+      console.log("here",filterObj);
     }
     const pageCount = await Vendor.count(filterObj) / parseInt(req.query.pageSize);
     vendor = await Vendor.find(filterObj).sort(sortObj).select(selectObj).skip(skipObj)
 .limit(limitObj);
+console.log("vendor", vendor)
     // const pageCount = vendor.length/pageSize;
     if (_.isEmpty(vendor)) return res.send('No Vendors');
     return res.send({ vendor, pageCount });
   } catch (err) {
+    console.log(err);
     throw err;
   }
 });
