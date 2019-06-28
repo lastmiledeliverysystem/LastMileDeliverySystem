@@ -12,20 +12,16 @@ const productSchema = Joi.object().keys({
   name: Joi.string().required(),
   category: Joi.string().required(),
   description: Joi.string().required(),
-  rate: Joi.number().required(),
+  rate: Joi.number(),
   price: Joi.number().required(),
-  specs: Joi.string().required(),
+  specs: Joi.string(),
   quantity: Joi.number().required(),
   unit: Joi.string().required(),
-  sku: Joi.string().required(),
-  barCode: Joi.string().required(),
-  productId: Joi.number().required(),
-  vendorId: Joi.objectId(),
-  options: Joi.object().keys({
-    image: Joi.string().required(),
-    color: Joi.string().required(),
-    size: Joi.string().required(),
-  }),
+  sku: Joi.string(),
+  barCode: Joi.string(),
+  // productId: Joi.number().required(),
+  vendorId: Joi.objectId().required(),
+  image: Joi.string().required(),
 });
 
 
@@ -142,6 +138,7 @@ try {
     const product = req.body;
     console.log(product);
     const productValidationResult = Joi.validate(product, productSchema);
+    console.log(productValidationResult)
     if (productValidationResult.error) { return res.status(400).send(productValidationResult.error.details[0].message);}
     const newProduct = await Products.create(product);
     return res.send(newProduct);

@@ -117,7 +117,7 @@ router.post('/', async (req, res) => {
       vendorType,
       imageURL,
       address,
-    } = req.body;
+    } = req.body; 
     // const vendorProducts = await Products.create({vendorProducts:[]})
     const result = Joi.validate(req.body, vendorSchema);
     if (result.error) return res.status(400).send(result.error.details[0].message);

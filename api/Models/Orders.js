@@ -49,16 +49,5 @@ const orders = new mongoose.Schema({
   },
 
 });
-
-
-orders.pre('save', function (next) {
-  now = new Date();
-  this.updated_at = now;
-  if (!this.date) {
-    this.date = now;
-  }
-  next();
-});
-
 const Orders = mongoose.model('Orders', orders);
 module.exports = Orders;
