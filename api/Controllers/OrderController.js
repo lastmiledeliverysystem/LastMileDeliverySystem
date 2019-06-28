@@ -40,7 +40,7 @@ const schema = Joi.object().keys({
   }),
   quantity: Joi.number(),
   shippmentDate: Joi.date().format('DD-MM-YYYY'),
-  trackingPassword: Joi.string().regex(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/),
+  trackingPassword: Joi.string(),
   deliveryDate: Joi.date().format('DD-MM-YYYY'),
   paymentMethod: Joi.string(),
 
@@ -102,45 +102,55 @@ router.get('/', async (req, res) => {
     throw err;
   }
 });
-// Pagination
-router.get('/paging', async (req, res) => {
-  try {
-    let { pageNumber, pageSize } = req.query;
-    pageNumber = parseInt(pageNumber);
-    pageSize = parseInt(pageSize);
-    const order = await Orders.find({}).skip((pageNumber - 1) * pageSize).limit(pageSize);
-    if (_.isEmpty(order)) return res.send('No orders');
-    return res.send(order);
-  } catch (err) {
-    throw err;
-  }
-});
+// router.get('/search', async (req, res) => {
+//   try {
+//     const str = req.query;
+//     const queryStr = Object.keys(str);
+//     // console.log(queryStr);
+//     const sortObj = {};
+//     const filterObj = {};
+//     const selectObj = {};
+//     //const pageSize = 1;
+//     let skipObj = 1;
+//     let limitObj = 1;
+//     let product = NaN;
 
-// Sorting
-router.get('/sort', async (req, res) => {
-  try {
-    const sortObject = {};
-    const { sortBy } = req.query;
-    sortObject[sortBy] = 1;
-    const orders = await Orders.find().sort(sortObject);
-    if (_.isEmpty(orders)) return res.send('No orders');
-    return res.send(orders);
-  } catch (err) {
-    throw err;
-  }
-});
+//     if (queryStr.includes('sortBy')) {
+//       const { sortBy } = req.query;
+//       sortObj[sortBy] = 1;
+//     }
+//     if (queryStr.includes('pageNumber')) {
+//       let { pageNumber, pageSize } = req.query;
+//       pageNumber = parseInt(pageNumber);
+//       pageSize = parseInt(pageSize);
+//       skipObj = (pageNumber - 1) * pageSize;
+//       limitObj = pageSize;
+//     }
+//     if (queryStr.includes('selectBy')) {
+//       const { selectBy } = req.query;
+//       selectObj[selectBy] = 1;
+//     }
+//     if (queryStr.includes('filterBy')) {
+//       const { filterBy, value } = req.query;
+//       if (_.isArray(filterBy)) {
+//         for (let index = 0; index < filterBy.length; index++) {
+//           filterObj[filterBy[index]] = value[index];
+//         }
+//       } else {
+//         filterObj[filterBy] = value;
+//       }
+//       console.log(filterObj);
+//     }
+//     const pageCount = await Products.count(filterObj) / parseInt(req.query.pageSize);
+//     product = await Products.find(filterObj).sort(sortObj).select(selectObj).skip(skipObj).limit(limitObj);    
+//     if (_.isEmpty(product)) return res.send('No products');
+//     return res.send({ product, pageCount });
+    
+//   } catch (err) {
+//     res.send(err)
+//   }
+// });
 
-// Filtering
-router.get('/filter', async (req, res) => {
-  try {
-    const order = await Orders.find({})
-      .select({ date: 1, status: 1 });
-    if (_.isEmpty(order)) return res.send('No orders');
-    return res.send(order);
-  } catch (err) {
-    throw err;
-  }
-});
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;

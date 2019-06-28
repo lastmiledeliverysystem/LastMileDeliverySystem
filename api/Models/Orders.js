@@ -6,7 +6,7 @@ const orders = new mongoose.Schema({
   date: { type: Date, default: +new Date() + 2 * 60 * 60 * 1000 },
   status: {
     type: String,
-    required: true,
+    required: false,
   },
   quantity: Number,
   items: [{
@@ -39,13 +39,13 @@ const orders = new mongoose.Schema({
   trackingPassword: {
     type: String,
     required: true,
-    match: /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/,
+    // match: /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/,
   },
   vendorId: mongoose.Schema.Types.ObjectId,
   // paymentId: { type: mongoose.Schema.Types.ObjectId, ref: 'paymentcards', required: true },
   paymentMethod: {
     type: String,
-    required: true,
+    required: false,
   },
 
 });
