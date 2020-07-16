@@ -25,7 +25,7 @@
     "joi-date-extensions": "^1.2.0",
     "joi-objectid": "^2.0.0",
     "jsonwebtoken": "^8.5.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.19",
     "mongoose": "^5.4.11",
     "mongoose-paginate": "^5.0.3",
     "mongoose-type-email": "^1.0.10",
